@@ -5,7 +5,7 @@
 [![Build](https://img.shields.io/badge/Build-Gradle-blue.svg)](https://gradle.org/)
 [![Paper](https://img.shields.io/badge/Paper-1.20.x-blue.svg)](https://papermc.io/)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 
 **Sistem partnership untuk Minecraft dengan quest-based leveling dan rewards.**
 
@@ -117,6 +117,6 @@ src/main/java/github/revanjay/partnershiprewards/
 └── task/                         # Scheduled tasks
 ```
 
-## 📄 License
+---
 
-[MIT License](LICENSE) — Copyright (c) 2026 RevelX
+Made by **RevelX**
