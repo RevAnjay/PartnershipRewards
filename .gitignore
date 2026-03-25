@@ -1,0 +1,37 @@
+# Build
+build/
+target/
+out/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+*~
+
+# Gradle
+.gradle/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Plugin testing
+run/
+server/
+
+# Environment
+.env
+*.local
+
+# Agents/Skills (development tools)
+.agents/
+.gemini/
+manifest.kod
+skills-lock.json

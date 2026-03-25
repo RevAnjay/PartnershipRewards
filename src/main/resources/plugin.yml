@@ -1,0 +1,25 @@
+name: PartnershipRewards
+version: 1.1.0
+main: github.revanjay.partnershiprewards.PartnershipRewards
+api-version: '1.20'
+author: RevelX
+description: Partnership system with quest-based leveling and rewards
+
+commands:
+  partner:
+    description: Main partner command
+    usage: /partner <request|accept|reject|break|info|quest|level|top|list>
+    aliases: [p, partnership]
+  partneradmin:
+    description: Admin partner commands
+    usage: /partneradmin <reload|reset|set>
+    permission: partnershiprewards.admin
+    aliases: [pa, padmin]
+
+permissions:
+  partnershiprewards.use:
+    description: Use partner commands
+    default: true
+  partnershiprewards.admin:
+    description: Admin commands
+    default: op
