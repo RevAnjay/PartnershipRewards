@@ -8,6 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+import static github.revanjay.partnershiprewards.PartnershipRewards.sendActionBar;
+
 public class PlayTogetherTask extends BukkitRunnable {
     
     private final PartnershipRewards plugin;
@@ -19,7 +22,6 @@ public class PlayTogetherTask extends BukkitRunnable {
     @Override
     public void run() {
         try {
-            // Iterate online players instead of querying DB
             for (Player player : Bukkit.getOnlinePlayers()) {
                 processPlayer(player);
             }
@@ -40,20 +42,18 @@ public class PlayTogetherTask extends BukkitRunnable {
             if (partnership == null) return;
             
             Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
-            if (partner == null) return; // Partner offline
+            if (partner == null) return;
             if (player.getUniqueId().compareTo(partner.getUniqueId()) > 0) return;
             boolean completed = plugin.getQuestManager().updateQuestProgress(
                 player.getUniqueId(), 
                 QuestType.PLAY_TOGETHER, 
-                1 // 1 minute per tick
+                1
             );
             if (!completed && quest.getProgress() % 5 == 0 && quest.getProgress() > 0) {
-                String progressMsg = plugin.getConfig().getString("messages.prefix", "Â§d[Partnership] ")
-                    .replace("&", "Â§") + 
-                    "Â§7Main Bersama: Â§e" + quest.getProgress() + "/" + quest.getRequiredAmount() + " menit";
+                String actionBarMsg = "&d&lPlaying Together &e" + quest.getProgress() + "/" + quest.getRequiredAmount() + " min";
                 
-                player.sendMessage(progressMsg);
-                partner.sendMessage(progressMsg);
+                sendActionBar(player, actionBarMsg);
+                sendActionBar(partner, actionBarMsg);
             }
         } catch (Exception e) {
             plugin.getLogger().warning("Error processing player " + player.getName() + ": " + e.getMessage());

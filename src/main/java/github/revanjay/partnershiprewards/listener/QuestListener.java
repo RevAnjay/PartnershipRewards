@@ -36,6 +36,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+
 @RequiredArgsConstructor
 public class QuestListener implements Listener {
     
@@ -58,7 +60,7 @@ public class QuestListener implements Listener {
         
         if (itemInHand.getType().name().equalsIgnoreCase(quest.getTarget())) {
             plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.GIVE_ITEM, 1);
-            player.sendMessage("Â§a+1 progress untuk memberikan " + quest.getTarget() + "!");
+            player.sendMessage(colorize("&a+1 progress untuk memberikan " + quest.getTarget() + "!"));
         }
     }
     
@@ -130,7 +132,7 @@ public class QuestListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (event.getInventory().getType() != InventoryType.MERCHANT) return;
-        if (event.getSlot() != 2) return; // Result slot
+        if (event.getSlot() != 2) return;
         if (event.getCurrentItem() == null) return;
         
         UUID playerUuid = player.getUniqueId();
@@ -219,7 +221,7 @@ public class QuestListener implements Listener {
         
         if (!killer.getWorld().equals(partner.getWorld())) return;
         
-        double maxDistance = 100; // Boss fights have larger area
+        double maxDistance = 100;
         if (killer.getLocation().distance(partner.getLocation()) <= maxDistance) {
             plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.KILL_BOSS, 1);
             plugin.getQuestManager().updateQuestProgress(partner.getUniqueId(), QuestType.KILL_BOSS, 1);
@@ -241,7 +243,7 @@ public class QuestListener implements Listener {
         if (result.getType().name().equalsIgnoreCase(quest.getTarget())) {
             int amount = result.getAmount();
             if (event.isShiftClick()) {
-                amount = Math.min(64, amount * 9); // Estimate max craft amount
+                amount = Math.min(64, amount * 9);
             }
             plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.CRAFT_ITEM, amount);
         }
@@ -299,7 +301,7 @@ public class QuestListener implements Listener {
             cropType != Material.POTATOES && 
             cropType != Material.BEETROOTS) return;
         if (event.getBlock().getBlockData() instanceof org.bukkit.block.data.Ageable ageable) {
-            if (ageable.getAge() < ageable.getMaximumAge()) return; // Not mature
+            if (ageable.getAge() < ageable.getMaximumAge()) return;
         }
         
         plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.HARVEST_CROPS, 1);
@@ -321,12 +323,12 @@ public class QuestListener implements Listener {
         org.bukkit.World.Environment env = player.getWorld().getEnvironment();
         int maxY;
         switch (env) {
-            case NETHER -> maxY = 128;      // Full nether height
-            case THE_END -> maxY = 128;      // Full end height
-            default -> maxY = 128;           // Full overworld, reduced from 64
+            case NETHER -> maxY = 128;
+            case THE_END -> maxY = 128;
+            default -> maxY = 128;
         }
         
-        if (y > maxY) return; // Only skip extreme heights
+        if (y > maxY) return;
         String blockName = blockType.name();
         boolean isNaturalBlock = 
             blockType == Material.STONE ||
@@ -384,7 +386,7 @@ public class QuestListener implements Listener {
         
         if (!player.getWorld().equals(partner.getWorld())) return;
         
-        double maxDistance = 50; // Nether mining area
+        double maxDistance = 50;
         if (player.getLocation().distance(partner.getLocation()) <= maxDistance) {
             plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.MINE_ANCIENT_DEBRIS, 1);
         }
@@ -589,7 +591,7 @@ public class QuestListener implements Listener {
     
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLevelChange(PlayerLevelChangeEvent event) {
-        if (event.getNewLevel() <= event.getOldLevel()) return; // Must be level up, not down
+        if (event.getNewLevel() <= event.getOldLevel()) return;
         
         UUID playerUuid = event.getPlayer().getUniqueId();
         if (!plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.EARN_XP_LEVELS)) return;
@@ -625,7 +627,7 @@ public class QuestListener implements Listener {
         Player partner = Bukkit.getPlayer(partnership.getPartner(playerUuid));
         if (partner == null || !killer.getWorld().equals(partner.getWorld())) return;
         
-        double maxDistance = 50; // Nether fortress area
+        double maxDistance = 50;
         if (killer.getLocation().distance(partner.getLocation()) <= maxDistance) {
             plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.KILL_WITHER_SKELETONS, 1);
         }
@@ -638,8 +640,8 @@ public class QuestListener implements Listener {
         
         Material blockType = event.getBlock().getType();
         int y = event.getBlock().getY();
-        if (blockType == Material.DIAMOND_ORE && y >= 16) return;  // Normal diamond ore Y < 16
-        if (blockType == Material.DEEPSLATE_DIAMOND_ORE && y >= 0) return;  // Deepslate diamond ore Y < 0
+        if (blockType == Material.DIAMOND_ORE && y >= 16) return;
+        if (blockType == Material.DEEPSLATE_DIAMOND_ORE && y >= 0) return;
         if (blockType != Material.DIAMOND_ORE && blockType != Material.DEEPSLATE_DIAMOND_ORE) return;
         
         plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.MINE_DIAMOND_ORE, 1);
@@ -654,7 +656,4 @@ public class QuestListener implements Listener {
         
         plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.SMELT_NETHERITE, event.getItemAmount());
     }
-    
-    // PLAY_TOGETHER is handled by PlayTogetherTask, not an event listener
 }
-

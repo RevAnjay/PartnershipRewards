@@ -2,12 +2,16 @@ package github.revanjay.partnershiprewards.listener;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.Partnership;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +27,7 @@ public class PartnerListener implements Listener {
         this.plugin = plugin;
     }
     
-        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPartnerDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
         
@@ -38,16 +42,44 @@ public class PartnerListener implements Listener {
         }
         
         if (attacker == null) return;
-        if (attacker.equals(victim)) return; // Self-damage
+        if (attacker.equals(victim)) return;
         Partnership partnership = plugin.getPartnershipManager().getPartnership(attacker.getUniqueId());
         if (partnership == null) return;
         UUID partnerUuid = partnership.getPartner(attacker.getUniqueId());
         if (!partnerUuid.equals(victim.getUniqueId())) return;
         if (!partnership.isPvpEnabled()) {
             event.setCancelled(true);
-            if (ThreadLocalRandom.current().nextInt(10) == 0) { // 10% chance to show message
-                attacker.sendMessage("Â§dÂ§lPartner Â§8Â» Â§7PvP dengan partner dinonaktifkan. Gunakan Â§e/partner toggle pvp Â§7untuk mengaktifkan.");
+            if (ThreadLocalRandom.current().nextInt(10) == 0) {
+                attacker.sendMessage(colorize("&d&lPartner &8» &7PvP with partner is disabled. Use &e/partner toggle pvp &7to enable."));
             }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        
+        if (!plugin.getChatManager().isChatToggled(player.getUniqueId())) return;
+        
+        Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
+        if (partnership == null) {
+            plugin.getChatManager().toggleChat(player.getUniqueId());
+            return;
+        }
+        
+        event.setCancelled(true);
+        
+        String message = event.getMessage();
+        Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
+        
+        String chatFormat = colorize("&d[Partner] &f" + player.getName() + "&7: &f" + message);
+        player.sendMessage(chatFormat);
+        
+        if (partner != null) {
+            partner.sendMessage(chatFormat);
+            notifySpyingAdmins(player, partner, message);
+        } else {
+            player.sendMessage(colorize("&7(Partner is offline, message not delivered)"));
         }
     }
     
@@ -67,11 +99,11 @@ public class PartnerListener implements Listener {
         return spyingAdmins;
     }
     
-        public void notifySpyingAdmins(Player sender, Player receiver, String message) {
-        String spyFormat = "Â§8[Â§cSPYÂ§8] Â§d[Partner] Â§f" + sender.getName() + " Â§7â†’ Â§f" + receiver.getName() + "Â§7: " + message;
+    public void notifySpyingAdmins(Player sender, Player receiver, String message) {
+        String spyFormat = colorize("&8[&cSPY&8] &d[Partner] &f" + sender.getName() + " &7→ &f" + receiver.getName() + "&7: " + message);
         
         for (UUID adminUuid : spyingAdmins) {
-            Player admin = org.bukkit.Bukkit.getPlayer(adminUuid);
+            Player admin = Bukkit.getPlayer(adminUuid);
             if (admin != null && admin.hasPermission("partner.admin.spy")) {
                 admin.sendMessage(spyFormat);
             }

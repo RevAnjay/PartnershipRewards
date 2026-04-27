@@ -3,15 +3,19 @@ package github.revanjay.partnershiprewards;
 import github.revanjay.partnershiprewards.command.PartnerAdminCommand;
 import github.revanjay.partnershiprewards.command.PartnerCommand;
 import github.revanjay.partnershiprewards.database.DatabaseManager;
+import github.revanjay.partnershiprewards.hook.PartnerPlaceholderExpansion;
 import github.revanjay.partnershiprewards.listener.PartnerListener;
 import github.revanjay.partnershiprewards.listener.PlayerListener;
 import github.revanjay.partnershiprewards.listener.QuestListener;
-import github.revanjay.partnershiprewards.manager.PartnershipManager;
-import github.revanjay.partnershiprewards.manager.QuestManager;
-import github.revanjay.partnershiprewards.manager.RewardManager;
-import github.revanjay.partnershiprewards.manager.RequestManager;
+import github.revanjay.partnershiprewards.manager.*;
 import github.revanjay.partnershiprewards.task.PlayTogetherTask;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -22,6 +26,10 @@ public class PartnershipRewards extends JavaPlugin {
     private RewardManager rewardManager;
     private RequestManager requestManager;
     private QuestManager questManager;
+    private GiftManager giftManager;
+    private ChatManager chatManager;
+    private EffectManager effectManager;
+    private StreakManager streakManager;
     
     private PartnerListener partnerListener;
     private PlayTogetherTask playTogetherTask;
@@ -32,6 +40,18 @@ public class PartnershipRewards extends JavaPlugin {
         globalXpMultiplier = multiplier;
     }
     
+    public static String colorize(String msg) {
+        return ChatColor.translateAlternateColorCodes('&', msg);
+    }
+    
+    public static void sendActionBar(Player player, String message) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(colorize(message)));
+    }
+    
+    public static void playErrorSound(Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+    }
+    
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -40,8 +60,9 @@ public class PartnershipRewards extends JavaPlugin {
         registerCommands();
         registerListeners();
         startTasks();
+        registerHooks();
         
-        getLogger().info("PartnershipRewards telah diaktifkan!");
+        getLogger().info("PartnershipRewards v" + getDescription().getVersion() + " has been enabled!");
     }
     
     @Override
@@ -54,6 +75,10 @@ public class PartnershipRewards extends JavaPlugin {
             rewardManager.shutdown();
         }
         
+        if (effectManager != null) {
+            effectManager.shutdown();
+        }
+        
         if (playTogetherTask != null) {
             playTogetherTask.cancel();
         }
@@ -62,7 +87,7 @@ public class PartnershipRewards extends JavaPlugin {
             databaseManager.close();
         }
         
-        getLogger().info("PartnershipRewards telah dinonaktifkan!");
+        getLogger().info("PartnershipRewards has been disabled!");
     }
     
     private void initializeManagers() {
@@ -73,6 +98,10 @@ public class PartnershipRewards extends JavaPlugin {
         this.requestManager = new RequestManager(this);
         this.rewardManager = new RewardManager(this);
         this.questManager = new QuestManager(this);
+        this.giftManager = new GiftManager(this);
+        this.chatManager = new ChatManager(this);
+        this.effectManager = new EffectManager(this);
+        this.streakManager = new StreakManager(this);
         
         this.rewardManager.startRewardTask();
     }
@@ -92,6 +121,14 @@ public class PartnershipRewards extends JavaPlugin {
     private void startTasks() {
         this.playTogetherTask = new PlayTogetherTask(this);
         this.playTogetherTask.start();
+        this.effectManager.start();
+    }
+    
+    private void registerHooks() {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new PartnerPlaceholderExpansion(this).register();
+            getLogger().info("PlaceholderAPI hook registered! Use %partner_<placeholder>%");
+        }
     }
     
     public void reload() {
@@ -105,9 +142,18 @@ public class PartnershipRewards extends JavaPlugin {
             rewardManager.shutdown();
         }
         
+        if (effectManager != null) {
+            effectManager.shutdown();
+        }
+        
         this.rewardManager = new RewardManager(this);
         this.rewardManager.startRewardTask();
         
         this.questManager = new QuestManager(this);
+        this.giftManager = new GiftManager(this);
+        this.effectManager = new EffectManager(this);
+        this.effectManager.start();
+        this.streakManager = new StreakManager(this);
     }
 }
+

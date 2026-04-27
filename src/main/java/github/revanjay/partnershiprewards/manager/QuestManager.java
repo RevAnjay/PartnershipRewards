@@ -9,9 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +39,7 @@ public class QuestManager {
                 plugin.getDatabaseManager().updateQuestProgress(entry.getKey(), currentProgress);
                 pendingProgressUpdates.remove(entry.getKey(), currentProgress);
             }
-        }, 20L * 30, 20L * 30); // Every 30 seconds
+        }, 20L * 30, 20L * 30);
     }
     
         private void startDailyResetTask() {
@@ -47,7 +48,7 @@ public class QuestManager {
             long resetSeconds = resetHours * 3600;
             long now = Instant.now().getEpochSecond();
             
-            // Check all cached quests
+            
             Iterator<Map.Entry<Integer, ActiveQuest>> it = questCache.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<Integer, ActiveQuest> entry = it.next();
@@ -59,12 +60,11 @@ public class QuestManager {
                             resetExpiredQuest(partnership, quest);
                         });
                     } else {
-                        // Offline, remove from memory to prevent leak
                         it.remove();
                     }
                 }
             }
-        }, 20L * 60 * 5, 20L * 60 * 5); // Every 5 minutes
+        }, 20L * 60 * 5, 20L * 60 * 5);
     }
     
         private boolean isQuestExpired(ActiveQuest quest) {
@@ -79,8 +79,7 @@ public class QuestManager {
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
         
-        String expiredMsg = plugin.getConfig().getString("messages.prefix", "Â§d[Partnership] ").replace("&", "Â§") + 
-            "Â§câ° Quest kadaluarsa! Â§7Quest baru akan diberikan...";
+        String expiredMsg = colorize("&cQuest expired! A new quest is being generated...");
         
         if (p1 != null) p1.sendMessage(expiredMsg);
         if (p2 != null) p2.sendMessage(expiredMsg);
@@ -101,14 +100,12 @@ public class QuestManager {
             ActiveQuest quest = plugin.getDatabaseManager().getActiveQuest(partnership.getId());
             if (quest != null) {
                 if (isQuestExpired(quest)) {
-                    // Reset expired quest
                     resetExpiredQuest(partnership, quest);
                 } else {
                     questCache.put(partnership.getId(), quest);
                 }
             }
         } else {
-            // Check cached quest for expiration
             ActiveQuest cachedQuest = questCache.get(partnership.getId());
             if (cachedQuest != null && isQuestExpired(cachedQuest)) {
                 resetExpiredQuest(partnership, cachedQuest);
@@ -124,7 +121,6 @@ public class QuestManager {
             ActiveQuest quest = plugin.getDatabaseManager().getActiveQuest(partnership.getId());
             if (quest != null) {
                 if (isQuestExpired(quest)) {
-                    // resetExpiredQuest uses Bukkit API â€” must run on main thread
                     Bukkit.getScheduler().runTask(plugin, () -> resetExpiredQuest(partnership, quest));
                 } else {
                     questCache.put(partnership.getId(), quest);
@@ -144,7 +140,6 @@ public class QuestManager {
             Partnership partnership = plugin.getPartnershipManager().getPartnership(playerUuid);
             if (partnership != null) {
                 UUID partnerUuid = partnership.getPartner(playerUuid);
-                // If partner is also offline, completely clean up cache
                 if (partnerUuid != null && Bukkit.getPlayer(partnerUuid) == null) {
                     playerPartnershipCache.remove(partnerUuid);
                     questCache.remove(partnershipId);
@@ -175,10 +170,10 @@ public class QuestManager {
         ActiveQuest existingQuest = getActiveQuest(partnership);
         if (existingQuest != null) {
             plugin.getLogger().info("Partnership #" + partnership.getId() + " already has an active quest, returning existing");
-            return existingQuest; // Return existing quest instead of generating new one
+            return existingQuest;
         }
         if (isOnQuestCooldown(partnership)) {
-            return null; // Still on cooldown
+            return null;
         }
         List<QuestType> enabledTypes = getEnabledQuestTypes();
         if (enabledTypes.isEmpty()) {
@@ -186,7 +181,7 @@ public class QuestManager {
             return null;
         }
         
-        // Pick random type
+        
         QuestType questType = enabledTypes.get(ThreadLocalRandom.current().nextInt(enabledTypes.size()));
         String target = null;
         int amount = 0;
@@ -241,11 +236,11 @@ public class QuestManager {
                 if (!amounts.isEmpty()) {
                     amount = amounts.get(ThreadLocalRandom.current().nextInt(amounts.size()));
                 } else {
-                    amount = 10; // Default
+                    amount = 10;
                 }
             }
             case VISIT_NETHER -> {
-                amount = 1; // Just visit once
+                amount = 1;
             }
             case SLEEP_TOGETHER -> {
                 List<Integer> times = typeConfig.getIntegerList("times");
@@ -276,7 +271,7 @@ public class QuestManager {
             .progress(0)
             .createdAt(Instant.now().getEpochSecond())
             .build();
-        CompletableFuture.runAsync(() -> plugin.getDatabaseManager().saveActiveQuest(quest));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDatabaseManager().saveActiveQuest(quest));
         questCache.put(partnership.getId(), quest);
         
         return quest;
@@ -344,7 +339,7 @@ public class QuestManager {
         partnership.setLevel(newLevel);
         final int finalXp = newXp;
         final int finalLevel = newLevel;
-        CompletableFuture.runAsync(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().updatePartnershipXpAndLevel(partnershipId, finalXp, finalLevel);
             plugin.getDatabaseManager().deleteActiveQuest(partnershipId);
         });
@@ -353,9 +348,9 @@ public class QuestManager {
         notifyQuestComplete(partnership, xpReward);
         long now = Instant.now().getEpochSecond();
         partnership.setLastQuestComplete(now);
-        CompletableFuture.runAsync(() -> {
-            plugin.getDatabaseManager().updateLastQuestComplete(partnershipId, now);
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
+            plugin.getDatabaseManager().updateLastQuestComplete(partnershipId, now)
+        );
         int cooldownMinutes = plugin.getConfig().getInt("quest.cooldown-minutes", 60);
         notifyCooldownStart(partnership, cooldownMinutes);
     }
@@ -375,7 +370,7 @@ public class QuestManager {
             return plugin.getConfig().getInt("quest.xp-per-level." + level);
         }
         
-        // Fall back to formula
+        
         int baseXp = plugin.getConfig().getInt("quest.base-xp-for-level", 200);
         double multiplier = plugin.getConfig().getDouble("quest.xp-multiplier-per-level", 1.2);
         
@@ -394,7 +389,7 @@ public class QuestManager {
             baseReward = plugin.getConfig().getInt("quest.xp-per-quest", 100);
         }
         
-        // Apply Global Multiplier
+        
         return (int) (baseReward * PartnershipRewards.getGlobalXpMultiplier());
     }
     
@@ -421,10 +416,9 @@ public class QuestManager {
                 }
                 
                 if (broadcast != null && !broadcast.isEmpty()) {
-                    String message = broadcast
+                    String message = colorize(broadcast
                         .replace("{player}", name1)
-                        .replace("{partner}", name2)
-                        .replace("&", "Â§");
+                        .replace("{partner}", name2));
                     Bukkit.broadcastMessage(message);
                 }
             });
@@ -432,31 +426,30 @@ public class QuestManager {
     }
     
         private void notifyQuestComplete(Partnership partnership, int xpReward) {
-        String message = "Â§aÂ§lâœ“ Quest Selesai! Â§7+" + xpReward + " XP";
+        String message = colorize("&a&lQuest Complete! &7+" + xpReward + " XP");
         
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
         
-        if (p1 != null) p1.sendMessage(plugin.getConfig().getString("messages.prefix", "Â§d[Partnership] ").replace("&", "Â§") + message);
-        if (p2 != null) p2.sendMessage(plugin.getConfig().getString("messages.prefix", "Â§d[Partnership] ").replace("&", "Â§") + message);
+        if (p1 != null) p1.sendMessage(message);
+        if (p2 != null) p2.sendMessage(message);
     }
     
         private void notifyNewQuest(Partnership partnership) {
         ActiveQuest quest = questCache.get(partnership.getId());
         if (quest == null) return;
         
-        String prefix = plugin.getConfig().getString("messages.prefix", "Â§d[Partnership] ").replace("&", "Â§");
-        String message = "Â§eÂ§lQuest Baru! Â§7" + quest.getFormattedDescription();
+        String message = colorize("&e&lNew Quest! &7" + quest.getFormattedDescription());
         
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
         if (p1 != null) {
-            p1.sendMessage(prefix + message);
-            p1.sendTitle("Â§eÂ§lQuest Baru!", "Â§7" + quest.getQuestType().getDisplayName(), 10, 60, 20);
+            p1.sendMessage(message);
+            p1.sendTitle(colorize("&e&lNew Quest!"), colorize("&7" + quest.getQuestType().getDisplayName()), 10, 60, 20);
         }
         if (p2 != null) {
-            p2.sendMessage(prefix + message);
-            p2.sendTitle("Â§eÂ§lQuest Baru!", "Â§7" + quest.getQuestType().getDisplayName(), 10, 60, 20);
+            p2.sendMessage(message);
+            p2.sendTitle(colorize("&e&lNew Quest!"), colorize("&7" + quest.getQuestType().getDisplayName()), 10, 60, 20);
         }
     }
     
@@ -480,19 +473,18 @@ public class QuestManager {
     }
     
         private void notifyCooldownStart(Partnership partnership, int cooldownMinutes) {
-        String message = "Â§7Quest baru dalam Â§e" + cooldownMinutes + " menitÂ§7. Gunakan Â§e/partner level Â§7untuk cek status.";
-        String prefix = plugin.getConfig().getString("messages.prefix", "Â§d[Partnership] ").replace("&", "Â§");
+        String message = colorize("&7New quest in &e" + cooldownMinutes + " minutes&7. Use &e/partner level &7to check status.");
         
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
         
-        if (p1 != null) p1.sendMessage(prefix + message);
-        if (p2 != null) p2.sendMessage(prefix + message);
+        if (p1 != null) p1.sendMessage(message);
+        if (p2 != null) p2.sendMessage(message);
     }
     
         public void deleteActiveQuest(Partnership partnership) {
         questCache.remove(partnership.getId());
-        CompletableFuture.runAsync(() -> plugin.getDatabaseManager().deleteActiveQuest(partnership.getId()));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDatabaseManager().deleteActiveQuest(partnership.getId()));
     }
     
         public void shutdown() {
@@ -502,6 +494,25 @@ public class QuestManager {
             }
             pendingProgressUpdates.clear();
         }
+    }
+    
+    public void addBonusXp(Partnership partnership, int bonusXp) {
+        int newXp = partnership.getXp() + bonusXp;
+        int newLevel = partnership.getLevel();
+        int requiredXp = getRequiredXpForLevel(newLevel + 1);
+        while (newXp >= requiredXp && newLevel < plugin.getConfig().getInt("quest.max-level", 50)) {
+            newXp -= requiredXp;
+            newLevel++;
+            giveLevelUpReward(partnership, newLevel);
+            requiredXp = getRequiredXpForLevel(newLevel + 1);
+        }
+        partnership.setXp(newXp);
+        partnership.setLevel(newLevel);
+        final int finalXp = newXp;
+        final int finalLevel = newLevel;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getDatabaseManager().updatePartnershipXpAndLevel(partnership.getId(), finalXp, finalLevel);
+        });
     }
 }
 

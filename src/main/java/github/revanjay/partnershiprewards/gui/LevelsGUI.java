@@ -18,6 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
@@ -29,7 +31,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
     private final Partnership partnership;
     private final Inventory inventory;
     
-    private static final String GUI_TITLE = "Â§6Â§lâš” Â§ePartnership Level";
+    private static final String GUI_TITLE = colorize("&6&lPartnership Level");
     
     public LevelsGUI(PartnershipRewards plugin, Player viewer, Partnership partnership) {
         this.plugin = plugin;
@@ -56,7 +58,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         inventory.setItem(20, createQuestProgressItem());
         inventory.setItem(21, createTimeItem());
         inventory.setItem(22, createNextRewardItem());
-        inventory.setItem(26, createItem(Material.BARRIER, "Â§cÂ§lTutup", Arrays.asList("Â§7Klik untuk menutup")));
+        inventory.setItem(26, createItem(Material.BARRIER, colorize("&c&lClose"), Arrays.asList(colorize("&7Click to close"))));
     }
     
     private ItemStack createPlayerHead(UUID uuid, String name) {
@@ -64,7 +66,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         if (meta != null) {
             meta.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
-            meta.setDisplayName("Â§eÂ§lPartner: Â§f" + name);
+            meta.setDisplayName(colorize("&e&lPartner: &f" + name));
             
             long durationDays = partnership.getDurationInDays();
             String duration = formatDuration(partnership.getDurationInSeconds());
@@ -74,9 +76,9 @@ public class LevelsGUI implements InventoryHolder, Listener {
             
             meta.setLore(Arrays.asList(
                 "",
-                "Â§7Durasi: Â§a" + duration,
-                "Â§7Sejak: Â§b" + startDate,
-                "Â§7Hari: Â§e" + durationDays + " hari"
+                colorize("&7Duration: &a" + duration),
+                colorize("&7Since: &b" + startDate),
+                colorize("&7Days: &e" + durationDays + " days")
             ));
             head.setItemMeta(meta);
         }
@@ -95,18 +97,18 @@ public class LevelsGUI implements InventoryHolder, Listener {
         
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add("Â§7XP Saat Ini: Â§b" + xp);
-        lore.add("Â§7XP Dibutuhkan: Â§e" + requiredXp);
+        lore.add(colorize("&7Current XP: &b" + xp));
+        lore.add(colorize("&7Required XP: &e" + requiredXp));
         lore.add("");
         
         if (level >= maxLevel) {
-            lore.add("Â§aÂ§lâœ“ MAX LEVEL!");
+            lore.add(colorize("&a&lMAX LEVEL"));
         } else {
             int percentage = requiredXp > 0 ? (xp * 100) / requiredXp : 100;
-            lore.add("Â§7Progress: Â§a" + percentage + "%");
+            lore.add(colorize("&7Progress: &a" + percentage + "%"));
         }
         
-        return createItem(material, "Â§6Â§lLevel " + level, lore);
+        return createItem(material, colorize("&6&lLevel " + level), lore);
     }
     
     private void createXpProgressBar() {
@@ -116,7 +118,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         
         for (int i = 0; i < 6; i++) {
             Material pane = i < filledSlots ? Material.LIME_STAINED_GLASS_PANE : Material.WHITE_STAINED_GLASS_PANE;
-            String name = i < filledSlots ? "Â§aÂ§lâ–ˆ" : "Â§7Â§lâ–‘";
+            String name = i < filledSlots ? colorize("&a&l█") : colorize("&7&l▒");
             inventory.setItem(11 + i, createItem(pane, name, null));
         }
     }
@@ -127,24 +129,24 @@ public class LevelsGUI implements InventoryHolder, Listener {
         if (quest == null) {
             if (plugin.getQuestManager().isOnQuestCooldown(partnership)) {
                 long remaining = plugin.getQuestManager().getQuestCooldownRemaining(partnership);
-                return createItem(Material.CLOCK, "Â§cÂ§lCooldown Aktif", Arrays.asList(
+                return createItem(Material.CLOCK, colorize("&c&lCooldown Active"), Arrays.asList(
                     "",
-                    "Â§7Quest baru tersedia dalam:",
-                    "Â§e" + remaining + " menit",
+                    colorize("&7New quest available in:"),
+                    colorize("&e" + remaining + " minutes"),
                     "",
-                    "Â§8Selesaikan quest untuk",
-                    "Â§8mendapatkan XP!"
+                    colorize("&8Complete quests to"),
+                    colorize("&8earn XP!")
                 ));
             }
-            return createItem(Material.PAPER, "Â§aÂ§lQuest Tersedia!", Arrays.asList(
+            return createItem(Material.PAPER, colorize("&a&lQuest Available!"), Arrays.asList(
                 "",
-                "Â§7Kamu bisa ambil quest baru!",
-                "Â§7Gunakan Â§e/partner quest Â§7untuk",
-                "Â§7mendapatkan quest baru."
+                colorize("&7You can get a new quest!"),
+                colorize("&7Use &e/partner quest &7to"),
+                colorize("&7generate a new quest.")
             ));
         }
         Material material = quest.getQuestType().isBonusQuest() ? Material.GOLDEN_APPLE : Material.PAPER;
-        String prefix = quest.getQuestType().isBonusQuest() ? "Â§6Â§lâ˜… BONUS: " : "Â§eÂ§l";
+        String prefix = quest.getQuestType().isBonusQuest() ? colorize("&6&lBONUS: ") : colorize("&e&l");
         ConfigurationSection typeConfig = plugin.getConfig()
             .getConfigurationSection("quest.types." + quest.getQuestType().name());
         int xpReward = typeConfig != null && typeConfig.contains("xp-reward") 
@@ -156,12 +158,12 @@ public class LevelsGUI implements InventoryHolder, Listener {
         
         return createItem(material, prefix + quest.getQuestType().getDisplayName(), Arrays.asList(
             "",
-            "Â§7" + quest.getFormattedDescription(),
+            colorize("&7" + quest.getFormattedDescription()),
             "",
-            "Â§7Progress: " + quest.getProgressBar(),
-            "Â§7Selesai: Â§e" + progress + "Â§7/Â§e" + required + " Â§8(Â§a" + percentage + "%Â§8)",
+            colorize("&7Progress: ") + quest.getProgressBar(),
+            colorize("&7Done: &e" + progress + "&7/&e" + required + " &8(&a" + percentage + "%&8)"),
             "",
-            "Â§7Reward: Â§b+" + xpReward + " XP"
+            colorize("&7Reward: &b+" + xpReward + " XP")
         ));
     }
     
@@ -169,7 +171,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         ActiveQuest quest = plugin.getQuestManager().getActiveQuest(viewer.getUniqueId());
         
         if (quest == null) {
-            return createItem(Material.GRAY_DYE, "Â§7Progress", Arrays.asList("Â§cTidak ada quest"));
+            return createItem(Material.GRAY_DYE, colorize("&7Progress"), Arrays.asList(colorize("&cNo quest")));
         }
         
         int progress = quest.getProgress();
@@ -179,11 +181,11 @@ public class LevelsGUI implements InventoryHolder, Listener {
         Material material = percentage >= 100 ? Material.LIME_DYE : 
                            percentage >= 50 ? Material.YELLOW_DYE : Material.RED_DYE;
         
-        return createItem(material, "Â§aÂ§lProgress: " + percentage + "%", Arrays.asList(
+        return createItem(material, colorize("&a&lProgress: " + percentage + "%"), Arrays.asList(
             "",
             quest.getProgressBar(),
             "",
-            "Â§7Selesai: Â§e" + progress + "Â§7/Â§e" + required
+            colorize("&7Done: &e" + progress + "&7/&e" + required)
         ));
     }
     
@@ -191,7 +193,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         ActiveQuest quest = plugin.getQuestManager().getActiveQuest(viewer.getUniqueId());
         
         if (quest == null) {
-            return createItem(Material.CLOCK, "Â§7Waktu", Arrays.asList("Â§cTidak ada quest"));
+            return createItem(Material.CLOCK, colorize("&7Time"), Arrays.asList(colorize("&cNo quest")));
         }
         
         long resetHours = plugin.getConfig().getLong("quest.reset-hours", 24);
@@ -206,16 +208,16 @@ public class LevelsGUI implements InventoryHolder, Listener {
         if (remaining > 0) {
             long hoursRemaining = remaining / 3600;
             long minutesRemaining = (remaining % 3600) / 60;
-            lore.add("Â§7Sisa: Â§e" + hoursRemaining + " jam " + minutesRemaining + " menit");
+            lore.add(colorize("&7Remaining: &e" + hoursRemaining + "h " + minutesRemaining + "m"));
             lore.add("");
-            lore.add("Â§8Quest akan reset jika tidak");
-            lore.add("Â§8diselesaikan tepat waktu.");
+            lore.add(colorize("&8Quest will reset if not"));
+            lore.add(colorize("&8completed in time."));
         } else {
-            lore.add("Â§câš  KADALUARSA!");
-            lore.add("Â§7Quest akan di-reset otomatis.");
+            lore.add(colorize("&cEXPIRED!"));
+            lore.add(colorize("&7Quest will be auto-reset."));
         }
         
-        String title = remaining > 0 ? "Â§eÂ§lWaktu Tersisa" : "Â§cÂ§lâš  Kadaluarsa!";
+        String title = remaining > 0 ? colorize("&e&lTime Remaining") : colorize("&c&lExpired!");
         return createItem(Material.CLOCK, title, lore);
     }
     
@@ -224,26 +226,26 @@ public class LevelsGUI implements InventoryHolder, Listener {
         int maxLevel = plugin.getConfig().getInt("quest.max-level", 50);
         
         if (partnership.getLevel() >= maxLevel) {
-            return createItem(Material.NETHER_STAR, "Â§dÂ§lâœ“ MAX LEVEL", Arrays.asList(
+            return createItem(Material.NETHER_STAR, colorize("&d&lMAX LEVEL"), Arrays.asList(
                 "",
-                "Â§7Kamu sudah mencapai level maksimum!",
-                "Â§7Selamat! ðŸŽ‰"
+                colorize("&7You've reached the maximum level!"),
+                colorize("&7Congratulations!")
             ));
         }
         
         ConfigurationSection rewardSection = plugin.getConfig().getConfigurationSection("level-rewards." + nextLevel);
         
         if (rewardSection == null) {
-            return createItem(Material.GOLD_INGOT, "Â§eÂ§lLevel " + nextLevel, Arrays.asList(
+            return createItem(Material.GOLD_INGOT, colorize("&e&lLevel " + nextLevel), Arrays.asList(
                 "",
-                "Â§7Tidak ada reward khusus",
-                "Â§7untuk level ini."
+                colorize("&7No special reward"),
+                colorize("&7for this level.")
             ));
         }
         
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add("Â§7Rewards untuk Â§eLevel " + nextLevel + "Â§7:");
+        lore.add(colorize("&7Rewards for &eLevel " + nextLevel + "&7:"));
         lore.add("");
         
         List<String> commands = rewardSection.getStringList("commands");
@@ -251,10 +253,10 @@ public class LevelsGUI implements InventoryHolder, Listener {
             String readable = cmd.replace("give {player} ", "")
                                  .replace("give {partner} ", "")
                                  .replace("_", " ");
-            lore.add("Â§8â€¢ Â§a" + readable);
+            lore.add(colorize("&8• &a" + readable));
         }
         
-        return createItem(Material.CHEST, "Â§6Â§lReward Level " + nextLevel, lore);
+        return createItem(Material.CHEST, colorize("&6&lReward Level " + nextLevel), lore);
     }
     
     private ItemStack createItem(Material material, String name, List<String> lore) {
@@ -275,9 +277,9 @@ public class LevelsGUI implements InventoryHolder, Listener {
         long hours = (seconds % 86400) / 3600;
         
         if (days > 0) {
-            return days + " hari " + hours + " jam";
+            return days + "d " + hours + "h";
         } else {
-            return hours + " jam";
+            return hours + "h";
         }
     }
     
@@ -306,4 +308,3 @@ public class LevelsGUI implements InventoryHolder, Listener {
         HandlerList.unregisterAll(this);
     }
 }
-

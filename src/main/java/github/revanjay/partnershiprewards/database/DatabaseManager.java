@@ -2,6 +2,7 @@ package github.revanjay.partnershiprewards.database;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.ActiveQuest;
+import github.revanjay.partnershiprewards.model.GiftData;
 import github.revanjay.partnershiprewards.model.Partnership;
 import github.revanjay.partnershiprewards.model.QuestType;
 import com.zaxxer.hikari.HikariConfig;
@@ -88,6 +89,16 @@ public class DatabaseManager {
             )
         """;
         
+        String createGifts = """
+            CREATE TABLE IF NOT EXISTS partner_gifts (
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                sender_uuid VARCHAR(36) NOT NULL,
+                receiver_uuid VARCHAR(36) NOT NULL,
+                item_data TEXT NOT NULL,
+                sent_at BIGINT NOT NULL
+            )
+        """;
+        
         boolean isSqlite = plugin.getConfig().getString("database.type", "SQLITE").equalsIgnoreCase("SQLITE");
         
         if (isSqlite) {
@@ -95,16 +106,29 @@ public class DatabaseManager {
             createPartnerships = createPartnerships.replace("UNIQUE KEY unique_partnership (player1_uuid, player2_uuid)", "UNIQUE (player1_uuid, player2_uuid)");
             createActiveQuests = createActiveQuests.replace("AUTO_INCREMENT", "AUTOINCREMENT");
             createActiveQuests = createActiveQuests.replace(",\n                FOREIGN KEY (partnership_id) REFERENCES partnerships(id) ON DELETE CASCADE", "");
+            createGifts = createGifts.replace("AUTO_INCREMENT", "AUTOINCREMENT");
         }
         
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createPartnerships);
             stmt.execute(createActiveQuests);
+            stmt.execute(createGifts);
             addColumnIfNotExists(conn, "partnerships", "level", "INTEGER DEFAULT 1");
             addColumnIfNotExists(conn, "partnerships", "xp", "INTEGER DEFAULT 0");
             addColumnIfNotExists(conn, "partnerships", "last_quest_complete", "BIGINT DEFAULT 0");
             addColumnIfNotExists(conn, "partnerships", "pvp_enabled", "INTEGER DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "effects_enabled", "INTEGER DEFAULT 1");
+            addColumnIfNotExists(conn, "partnerships", "home_world", "VARCHAR(100)");
+            addColumnIfNotExists(conn, "partnerships", "home_x", "DOUBLE DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "home_y", "DOUBLE DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "home_z", "DOUBLE DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "home_yaw", "FLOAT DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "home_pitch", "FLOAT DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "login_streak", "INTEGER DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "last_streak_date", "BIGINT DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "player1_last_login", "BIGINT DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "player2_last_login", "BIGINT DEFAULT 0");
         } catch (SQLException e) {
             plugin.getLogger().severe("Error creating tables: " + e.getMessage());
             e.printStackTrace();
@@ -190,17 +214,7 @@ public class DatabaseManager {
             
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Partnership.builder()
-                    .id(rs.getInt("id"))
-                    .player1(UUID.fromString(rs.getString("player1_uuid")))
-                    .player2(UUID.fromString(rs.getString("player2_uuid")))
-                    .startedAt(rs.getLong("started_at"))
-                    .lastRewardCheck(rs.getLong("last_reward_check"))
-                    .level(rs.getInt("level"))
-                    .xp(rs.getInt("xp"))
-                    .lastQuestComplete(rs.getLong("last_quest_complete"))
-                    .pvpEnabled(rs.getInt("pvp_enabled") == 1)
-                    .build();
+                return buildPartnership(rs);
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("Error getting partnership: " + e.getMessage());
@@ -218,19 +232,34 @@ public class DatabaseManager {
              ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
-                partnerships.add(Partnership.builder()
-                    .id(rs.getInt("id"))
-                    .player1(UUID.fromString(rs.getString("player1_uuid")))
-                    .player2(UUID.fromString(rs.getString("player2_uuid")))
-                    .startedAt(rs.getLong("started_at"))
-                    .lastRewardCheck(rs.getLong("last_reward_check"))
-                    .level(rs.getInt("level"))
-                    .xp(rs.getInt("xp"))
-                    .pvpEnabled(rs.getInt("pvp_enabled") == 1)
-                    .build());
+                partnerships.add(buildPartnership(rs));
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("Error getting all partnerships: " + e.getMessage());
+        }
+        
+        return partnerships;
+    }
+    
+    public List<Partnership> getEligiblePartnershipsForReward(int minDays) {
+        List<Partnership> partnerships = new ArrayList<>();
+        long now = Instant.now().getEpochSecond();
+        long minAge = (long) minDays * 86400;
+        
+        String sql = "SELECT * FROM partnerships WHERE (? - started_at) >= ? AND ((last_reward_check - started_at) / 86400) < ((? - started_at) / 86400)";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, now);
+            stmt.setLong(2, minAge);
+            stmt.setLong(3, now);
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                partnerships.add(buildPartnership(rs));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error getting eligible partnerships: " + e.getMessage());
         }
         
         return partnerships;
@@ -380,21 +409,180 @@ public class DatabaseManager {
             
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                partnerships.add(Partnership.builder()
-                    .id(rs.getInt("id"))
-                    .player1(UUID.fromString(rs.getString("player1_uuid")))
-                    .player2(UUID.fromString(rs.getString("player2_uuid")))
-                    .startedAt(rs.getLong("started_at"))
-                    .lastRewardCheck(rs.getLong("last_reward_check"))
-                    .level(rs.getInt("level"))
-                    .xp(rs.getInt("xp"))
-                    .build());
+                partnerships.add(buildPartnership(rs));
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("Error getting top partnerships: " + e.getMessage());
         }
         
         return partnerships;
+    }
+    
+    
+    private Partnership buildPartnership(ResultSet rs) throws SQLException {
+        return Partnership.builder()
+            .id(rs.getInt("id"))
+            .player1(UUID.fromString(rs.getString("player1_uuid")))
+            .player2(UUID.fromString(rs.getString("player2_uuid")))
+            .startedAt(rs.getLong("started_at"))
+            .lastRewardCheck(rs.getLong("last_reward_check"))
+            .level(rs.getInt("level"))
+            .xp(rs.getInt("xp"))
+            .lastQuestComplete(rs.getLong("last_quest_complete"))
+            .pvpEnabled(rs.getInt("pvp_enabled") == 1)
+            .effectsEnabled(rs.getInt("effects_enabled") == 1)
+            .homeWorld(rs.getString("home_world"))
+            .homeX(rs.getDouble("home_x"))
+            .homeY(rs.getDouble("home_y"))
+            .homeZ(rs.getDouble("home_z"))
+            .homeYaw(rs.getFloat("home_yaw"))
+            .homePitch(rs.getFloat("home_pitch"))
+            .loginStreak(rs.getInt("login_streak"))
+            .lastStreakDate(rs.getLong("last_streak_date"))
+            .player1LastLogin(rs.getLong("player1_last_login"))
+            .player2LastLogin(rs.getLong("player2_last_login"))
+            .build();
+    }
+    
+    
+    public void updateEffectsEnabled(int partnershipId, boolean enabled) {
+        String sql = "UPDATE partnerships SET effects_enabled = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, enabled ? 1 : 0);
+            stmt.setInt(2, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error updating effects_enabled: " + e.getMessage());
+        }
+    }
+    
+    
+    public void updatePartnerHome(int partnershipId, org.bukkit.Location loc) {
+        String sql = "UPDATE partnerships SET home_world = ?, home_x = ?, home_y = ?, home_z = ?, home_yaw = ?, home_pitch = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, loc.getWorld().getName());
+            stmt.setDouble(2, loc.getX());
+            stmt.setDouble(3, loc.getY());
+            stmt.setDouble(4, loc.getZ());
+            stmt.setFloat(5, loc.getYaw());
+            stmt.setFloat(6, loc.getPitch());
+            stmt.setInt(7, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error updating partner home: " + e.getMessage());
+        }
+    }
+    
+    public void deletePartnerHome(int partnershipId) {
+        String sql = "UPDATE partnerships SET home_world = NULL, home_x = 0, home_y = 0, home_z = 0, home_yaw = 0, home_pitch = 0 WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error deleting partner home: " + e.getMessage());
+        }
+    }
+    
+    
+    public void updateLoginStreak(int partnershipId, int streak, long lastStreakDate) {
+        String sql = "UPDATE partnerships SET login_streak = ?, last_streak_date = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, streak);
+            stmt.setLong(2, lastStreakDate);
+            stmt.setInt(3, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error updating login streak: " + e.getMessage());
+        }
+    }
+    
+    public void updatePlayerLogin(int partnershipId, boolean isPlayer1, long epochDay) {
+        String column = isPlayer1 ? "player1_last_login" : "player2_last_login";
+        String sql = "UPDATE partnerships SET " + column + " = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, epochDay);
+            stmt.setInt(2, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error updating player login: " + e.getMessage());
+        }
+    }
+    
+    
+    public void saveGift(UUID sender, UUID receiver, String itemData, long sentAt) {
+        String sql = "INSERT INTO partner_gifts (sender_uuid, receiver_uuid, item_data, sent_at) VALUES (?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, sender.toString());
+            stmt.setString(2, receiver.toString());
+            stmt.setString(3, itemData);
+            stmt.setLong(4, sentAt);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error saving gift: " + e.getMessage());
+        }
+    }
+    
+    public List<GiftData> getPendingGifts(UUID receiver) {
+        List<GiftData> gifts = new ArrayList<>();
+        String sql = "SELECT * FROM partner_gifts WHERE receiver_uuid = ? ORDER BY sent_at ASC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, receiver.toString());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                gifts.add(GiftData.builder()
+                    .id(rs.getInt("id"))
+                    .sender(UUID.fromString(rs.getString("sender_uuid")))
+                    .receiver(UUID.fromString(rs.getString("receiver_uuid")))
+                    .itemData(rs.getString("item_data"))
+                    .sentAt(rs.getLong("sent_at"))
+                    .build());
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error getting pending gifts: " + e.getMessage());
+        }
+        return gifts;
+    }
+    
+    public int getGiftCount(UUID receiver) {
+        String sql = "SELECT COUNT(*) FROM partner_gifts WHERE receiver_uuid = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, receiver.toString());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error counting gifts: " + e.getMessage());
+        }
+        return 0;
+    }
+    
+    public void deleteGift(int giftId) {
+        String sql = "DELETE FROM partner_gifts WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, giftId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error deleting gift: " + e.getMessage());
+        }
+    }
+    
+    public void deleteAllGifts(UUID receiver) {
+        String sql = "DELETE FROM partner_gifts WHERE receiver_uuid = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, receiver.toString());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error deleting all gifts: " + e.getMessage());
+        }
     }
     
     public void close() {

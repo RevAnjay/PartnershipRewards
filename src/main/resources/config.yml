@@ -290,77 +290,126 @@ level-rewards:
     commands:
       - "give {player} diamond 3"
       - "give {partner} diamond 3"
-    broadcast: "&d&l⚔ &e{player} &7& &e{partner} &8» &aNaik ke &a&lLevel 2&a!"
+    broadcast: "&d&lPartnership &e{player} &7& &e{partner} &8» &aReached &a&lLevel 2&a!"
   5:
     commands:
       - "give {player} diamond 10"
       - "give {partner} diamond 10"
-    broadcast: "&d&l⚔ &e{player} &7& &e{partner} &8» &aNaik ke &a&lLevel 5&a! &7✦"
+    broadcast: "&d&lPartnership &e{player} &7& &e{partner} &8» &aReached &a&lLevel 5&a!"
   10:
     commands:
       - "give {player} netherite_ingot 1"
       - "give {partner} netherite_ingot 1"
-    broadcast: "&d&l⚔ &6{player} &7& &6{partner} &8» &6&lLEVEL 10 &7🎉"
+    broadcast: "&d&lPartnership &6{player} &7& &6{partner} &8» &6&lLEVEL 10"
   15:
     commands:
       - "give {player} diamond_block 5"
       - "give {partner} diamond_block 5"
-    broadcast: "&d&l⚔ &b{player} &7& &b{partner} &8» &b&lLEVEL 15 &7⚡"
+    broadcast: "&d&lPartnership &b{player} &7& &b{partner} &8» &b&lLEVEL 15"
   20:
     commands:
       - "give {player} netherite_ingot 5"
       - "give {partner} netherite_ingot 5"
-    broadcast: "&d&l⚔ &d{player} &7& &d{partner} &8» &d&lLEVEL 20 &7⭐"
+    broadcast: "&d&lPartnership &d{player} &7& &d{partner} &8» &d&lLEVEL 20"
   25:
     commands:
       - "give {player} elytra 1"
       - "give {partner} elytra 1"
-    broadcast: "&d&l⚔ &5{player} &7& &5{partner} &8» &5&lLEVEL 25 &7🦋 &d&lMAX TIER!"
+    broadcast: "&d&lPartnership &5{player} &7& &5{partner} &8» &5&lLEVEL 25 &d&lMAX TIER!"
 
 messages:
   # ═══════════════════════════════════════════════
   # Prefix & Format
   # ═══════════════════════════════════════════════
-  prefix: "&d&l⚔ &dPartnership &8» &r"
+  prefix: "&d&lPartnership &8» &r"
   
   # ═══════════════════════════════════════════════
   # Partnership Request Messages
   # ═══════════════════════════════════════════════
-  request-sent: "&a✓ &7Permintaan partnership dikirim ke &e{player}&7!"
-  request-received: "&e✉ &e{player} &7ingin menjadi partner kamu!\\n&8   └ &7Ketik &f/partner accept {player} &7untuk menerima"
-  partnership-formed: "&a&l✓ DITERIMA! &7Kamu sekarang partner dengan &e{player}&7!"
-  partnership-broken: "&c&l✗ DIPUTUS! &7Partnership dengan &e{player} &7telah berakhir."
+  request-sent: "&aPartnership request sent to &e{player}&a!"
+  request-received: "&e{player} &7wants to be your partner!\\n&8   └ &7Type &f/partner accept {player} &7to accept"
+  partnership-formed: "&a&lACCEPTED! &7You are now partners with &e{player}&7!"
+  partnership-broken: "&c&lBROKEN! &7Partnership with &e{player} &7has ended."
   
   # ═══════════════════════════════════════════════
   # Error Messages
   # ═══════════════════════════════════════════════
-  no-partner: "&c✗ &7Kamu tidak memiliki partner saat ini."
-  already-partnered: "&c✗ &7Kamu sudah memiliki partner!"
-  target-has-partner: "&c✗ &e{player} &7sudah memiliki partner!"
-  no-pending-request: "&c✗ &7Tidak ada permintaan dari &e{player}&7."
-  request-expired: "&c⏰ &7Permintaan partnership telah kadaluarsa."
-  player-not-found: "&c✗ &7Player &e{player} &7tidak ditemukan."
-  player-not-online: "&c✗ &e{player} &7harus online!"
-  too-far: "&c✗ &7Kamu terlalu jauh dari &e{player}&7!"
-  cooldown: "&c⏳ &7Tunggu &e{seconds} detik &7lagi."
-  cannot-partner-self: "&c✗ &7Kamu tidak bisa partner dengan diri sendiri!"
+  no-partner: "&cYou don't have a partner."
+  already-partnered: "&cYou already have a partner!"
+  target-has-partner: "&e{player} &calready has a partner!"
+  no-pending-request: "&cNo pending request from &e{player}&c."
+  request-expired: "&cPartnership request has expired."
+  player-not-found: "&cPlayer &e{player} &cnot found."
+  player-not-online: "&e{player} &cmust be online!"
+  too-far: "&cYou are too far from &e{player}&c!"
+  cooldown: "&cWait &e{seconds} seconds &cmore."
+  cannot-partner-self: "&cYou can't partner with yourself!"
   
   # ═══════════════════════════════════════════════
   # Info Messages
   # ═══════════════════════════════════════════════
-  config-reloaded: "&a✓ &7Config berhasil di-reload!"
-  partnership-info: "&6&l⚔ PARTNERSHIP INFO\\n&8┌─────────────────────────\\n&8│ &7Partner: &e{player}\\n&8│ &7Durasi: &a{duration}\\n&8│ &7Sejak: &b{start_date}\\n&8└─────────────────────────"
-  no-partnerships: "&c✗ &7Tidak ada partnership aktif di server."
+  config-reloaded: "&aConfig reloaded successfully!"
+  partnership-info: "&6&lPARTNERSHIP INFO\\n&8┌─────────────────────────\\n&8│ &7Partner: &e{player}\\n&8│ &7Duration: &a{duration}\\n&8│ &7Since: &b{start_date}\\n&8└─────────────────────────"
+  no-partnerships: "&cNo active partnerships on the server."
   
   # ═══════════════════════════════════════════════
   # Quest Messages
   # ═══════════════════════════════════════════════
-  quest-complete: "&a&l✓ QUEST SELESAI! &7+&a{xp} XP"
-  new-quest: "&e&l★ QUEST BARU\\n&8   └ &7{description}"
-  level-up: "&b&l⬆ LEVEL UP! &7Sekarang &bLevel {level}"
-  quest-expired: "&c⏰ &7Quest kadaluarsa! Quest baru sedang dibuat..."
+  quest-complete: "&a&lQUEST COMPLETE! &7+&a{xp} XP"
+  new-quest: "&e&lNEW QUEST!\\n&8   └ &7{description}"
+  level-up: "&b&lLEVEL UP! &7Now &bLevel {level}"
+  quest-expired: "&cQuest expired! A new quest is being generated..."
   
   # ═══════════════════════════════════════════════
-  # Quest Progress (untuk listener)
+  # Quest Progress (for listeners)
   # ═══════════════════════════════════════════════
   quest-progress: "&8[&a+{amount}&8] &7{current}&8/&7{required}"
+
+# ═══════════════════════════════════════════════════════
+# GIFT SYSTEM
+# ═══════════════════════════════════════════════════════
+gift:
+  max-pending: 5
+
+# ═══════════════════════════════════════════════════════
+# PARTNER EFFECTS (Particle)
+# ═══════════════════════════════════════════════════════
+partner-effects:
+  enabled: false
+  interval-ticks: 60          # 60 ticks = 3 seconds
+  max-distance: 10.0          # Max radius for particles
+
+# ═══════════════════════════════════════════════════════
+# PARTNER TITLES (PlaceholderAPI)
+# ═══════════════════════════════════════════════════════
+partner-titles:
+  enabled: false
+  format: "&d[{title}] "
+  titles:
+    1: "Partner"
+    5: "Close"
+    10: "Bonded"
+    15: "Bestie"
+    20: "Soulmate"
+    25: "Eternal"
+
+# ═══════════════════════════════════════════════════════
+# PARTNER HOME
+# ═══════════════════════════════════════════════════════
+partner-home:
+  enabled: true
+  min-level: 3                # Minimum level to set home
+  warmup-seconds: 3           # Stand still before teleport
+  cooldown-seconds: 60        # Cooldown between teleports
+
+# ═══════════════════════════════════════════════════════
+# DAILY LOGIN STREAK
+# ═══════════════════════════════════════════════════════
+login-streak:
+  enabled: true
+  base-bonus-xp: 25           # XP bonus per streak level
+  max-streak: 7               # Max streak (7 days = 175 XP)
+  messages:
+    streak-continue: "&a&lStreak! &7Day &e{streak}&7! Bonus &b+{xp} XP"
+    streak-reset: "&cStreak reset! &7Login together with your partner to start a new streak."
+    waiting-partner: "&7Waiting for your partner to login today to continue the streak..."

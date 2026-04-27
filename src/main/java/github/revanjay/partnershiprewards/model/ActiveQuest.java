@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,23 +22,22 @@ public class ActiveQuest {
     @Builder.Default
     private volatile boolean rewardClaimed = false;
     
-        public boolean isCompleted() {
+    public boolean isCompleted() {
         return progress >= requiredAmount;
     }
     
-        public int getCompletionPercentage() {
+    public int getCompletionPercentage() {
         if (requiredAmount <= 0) return 100;
         return Math.min(100, (progress * 100) / requiredAmount);
     }
     
-        public synchronized boolean addProgress(int amount) {
-        // If reward already claimed, don't allow double completion
+    public synchronized boolean addProgress(int amount) {
         if (rewardClaimed) return false;
         
-        if (amount < 0) amount = 0; // Prevent negative progress
+        if (amount < 0) amount = 0;
         this.progress += amount;
         if (this.progress > requiredAmount) {
-            this.progress = requiredAmount; // Cap at max
+            this.progress = requiredAmount;
         }
         if (isCompleted() && !rewardClaimed) {
             rewardClaimed = true;
@@ -45,21 +46,21 @@ public class ActiveQuest {
         return false;
     }
     
-        public String getFormattedDescription() {
+    public String getFormattedDescription() {
         return questType.formatDescription(target, requiredAmount);
     }
     
-        public String getProgressBar() {
+    public String getProgressBar() {
         int percentage = getCompletionPercentage();
         int filled = percentage / 10;
         int empty = 10 - filled;
         
-        StringBuilder bar = new StringBuilder("Â§a");
-        for (int i = 0; i < filled; i++) bar.append("â–ˆ");
-        bar.append("Â§7");
-        for (int i = 0; i < empty; i++) bar.append("â–ˆ");
+        StringBuilder bar = new StringBuilder();
+        bar.append(colorize("&a"));
+        for (int i = 0; i < filled; i++) bar.append("\u2588");
+        bar.append(colorize("&7"));
+        for (int i = 0; i < empty; i++) bar.append("\u2588");
         
         return bar.toString();
     }
 }
-

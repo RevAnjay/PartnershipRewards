@@ -1,14 +1,15 @@
 name: PartnershipRewards
-version: 1.1.0
+version: 1.2.0
 main: github.revanjay.partnershiprewards.PartnershipRewards
 api-version: '1.20'
 author: RevelX
-description: Partnership system with quest-based leveling and rewards
+description: Partnership system with quest-based leveling, gifts, home, and rewards
+softdepend: [PlaceholderAPI]
 
 commands:
   partner:
     description: Main partner command
-    usage: /partner <request|accept|reject|break|info|quest|level|top|list>
+    usage: /partner <request|accept|reject|break|info|quest|level|chat|gift|gifts|sethome|home|delhome|toggle|top|list>
     aliases: [p, partnership]
   partneradmin:
     description: Admin partner commands

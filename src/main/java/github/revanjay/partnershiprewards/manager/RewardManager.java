@@ -7,9 +7,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class RewardManager {
     
@@ -36,12 +39,35 @@ public class RewardManager {
         }
     }
     
+    public void processPlayerJoin(UUID playerUuid) {
+        if (!plugin.getConfig().getBoolean("rewards.enabled", true)) {
+            return;
+        }
+        
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Partnership partnership = plugin.getDatabaseManager().getPartnership(playerUuid);
+            if (partnership == null) return;
+            
+            checkPartnershipRewards(partnership);
+        });
+    }
+    
     private void checkAndGiveRewards() {
         if (!plugin.getConfig().getBoolean("rewards.enabled", true)) {
             return;
         }
         
-        List<Partnership> partnerships = plugin.getPartnershipManager().getAllPartnerships();
+        ConfigurationSection milestonesSection = plugin.getConfig().getConfigurationSection("rewards.milestones");
+        if (milestonesSection == null) return;
+        
+        int minDays = Integer.MAX_VALUE;
+        for (String key : milestonesSection.getKeys(false)) {
+            int days = plugin.getConfig().getInt("rewards.milestones." + key + ".days", Integer.MAX_VALUE);
+            if (days < minDays) minDays = days;
+        }
+        if (minDays == Integer.MAX_VALUE) return;
+        
+        List<Partnership> partnerships = plugin.getDatabaseManager().getEligiblePartnershipsForReward(minDays);
         
         for (Partnership partnership : partnerships) {
             checkPartnershipRewards(partnership);
@@ -61,36 +87,55 @@ public class RewardManager {
             int requiredDays = plugin.getConfig().getInt("rewards.milestones." + key + ".days");
             
             if (durationInDays >= requiredDays && lastCheckInDays < requiredDays) {
-                giveReward(partnership, key);
+                Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
+                Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
+                
+                if (p1 == null && p2 == null) {
+                    continue;
+                }
+                
+                giveReward(partnership, key, p1, p2);
                 plugin.getDatabaseManager().updateLastRewardCheck(partnership.getId(), Instant.now().getEpochSecond());
             }
         }
     }
     
-    private void giveReward(Partnership partnership, String milestoneKey) {
+    private void giveReward(Partnership partnership, String milestoneKey, Player onlineP1, Player onlineP2) {
         String player1Name = Bukkit.getOfflinePlayer(partnership.getPlayer1()).getName();
         String player2Name = Bukkit.getOfflinePlayer(partnership.getPlayer2()).getName();
+        
+        if (player1Name == null) player1Name = partnership.getPlayer1().toString();
+        if (player2Name == null) player2Name = partnership.getPlayer2().toString();
         
         List<String> commands = plugin.getConfig().getStringList("rewards.milestones." + milestoneKey + ".commands");
         String broadcast = plugin.getConfig().getString("rewards.milestones." + milestoneKey + ".broadcast");
         
+        final String p1Name = player1Name;
+        final String p2Name = player2Name;
+        
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (String command : commands) {
                 String processedCmd = command
-                    .replace("{player}", player1Name)
-                    .replace("{partner}", player2Name);
+                    .replace("{player}", p1Name)
+                    .replace("{partner}", p2Name);
+                
+                boolean isForPlayer1 = command.contains("{player}");
+                boolean isForPlayer2 = command.contains("{partner}");
+                
+                if (isForPlayer1 && onlineP1 == null) continue;
+                if (isForPlayer2 && onlineP2 == null) continue;
                 
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), processedCmd);
             }
             
             if (broadcast != null && !broadcast.isEmpty()) {
-                String message = broadcast
-                    .replace("{player}", player1Name)
-                    .replace("{partner}", player2Name)
-                    .replace("&", "Â§");
+                String message = colorize(broadcast
+                    .replace("{player}", p1Name)
+                    .replace("{partner}", p2Name));
                 
                 Bukkit.broadcastMessage(message);
             }
         });
     }
 }
+

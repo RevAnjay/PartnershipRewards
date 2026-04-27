@@ -40,14 +40,13 @@ public class PartnershipManager {
     }
     
         public void breakPartnershipDB(UUID player) {
-        // Try cache first
         Partnership cached = getPartnership(player);
         if (cached != null) {
             breakPartnership(player);
             return;
         }
         
-        // Not cached â€” query DB async and delete
+        
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Partnership partnership = plugin.getDatabaseManager().getPartnership(player);
             if (partnership != null) {
