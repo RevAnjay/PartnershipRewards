@@ -258,7 +258,7 @@ src/main/java/github/revanjay/partnershiprewards/
 |---------|------|-----------|
 | Paper API 1.20.1 | compileOnly | Server API |
 | Lombok 1.18.38 | compileOnly | Annotation processor |
-| PlaceholderAPI 2.11.6 | compileOnly (optional) | Placeholder support |
+| PlaceholderAPI 2.12.2 | compileOnly (optional) | Placeholder support |
 | HikariCP 5.0.1 | bundled | Connection pooling |
 | SQLite JDBC 3.42.0.0 | bundled | SQLite driver |
 
