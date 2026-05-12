@@ -25,7 +25,7 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("partnershiprewards.admin")) {
-            sender.sendMessage(colorize("&cYou don't have permission!"));
+            sender.sendMessage(plugin.getLanguageManager().getMessage("cmd-no-permission", true));
             if (sender instanceof Player p) playErrorSound(p);
             return true;
         }
@@ -53,13 +53,12 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
     
     private void handleReset(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(colorize("&cUsage: /partneradmin reset <player>"));
+            sender.sendMessage(plugin.getLanguageManager().getMessage("cmd-usage-reset", true));
             if (sender instanceof Player p) playErrorSound(p);
             return;
         }
         
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            @SuppressWarnings("deprecation")
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
             UUID targetUUID = target.getUniqueId();
             
@@ -83,22 +82,22 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
             plugin.getPartnershipManager().breakPartnershipDB(targetUUID);
             
             Bukkit.getScheduler().runTask(plugin, () -> {
-                sender.sendMessage(colorize("&aPartnership between &e" + targetName + " &aand &e" + fPartnerName + " &ahas been reset!"));
+                sender.sendMessage(plugin.getLanguageManager().getMessage("admin-reset-success", true)
+                    .replace("{player}", targetName)
+                    .replace("{partner}", fPartnerName));
             });
         });
     }
     
     private void handleSet(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            sender.sendMessage(colorize("&cUsage: /partneradmin set <player1> <player2>"));
+            sender.sendMessage(plugin.getLanguageManager().getMessage("cmd-usage-set", true));
             if (sender instanceof Player p) playErrorSound(p);
             return;
         }
         
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            @SuppressWarnings("deprecation")
             OfflinePlayer player1 = Bukkit.getOfflinePlayer(args[1]);
-            @SuppressWarnings("deprecation")
             OfflinePlayer player2 = Bukkit.getOfflinePlayer(args[2]);
             UUID uuid1 = player1.getUniqueId();
             UUID uuid2 = player2.getUniqueId();
@@ -127,7 +126,9 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
             String name2 = player2.getName() != null ? player2.getName() : args[2];
             
             plugin.getPartnershipManager().createPartnership(uuid1, uuid2);
-            Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(colorize("&aPartnership between &e" + name1 + " &aand &e" + name2 + " &ahas been created!")));
+            Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(plugin.getLanguageManager().getMessage("admin-set-success", true)
+                .replace("{p1}", name1)
+                .replace("{p2}", name2)));
         });
     }
     
@@ -141,7 +142,7 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
     
     private void handleToggle(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(colorize("&cThis command can only be used by players!"));
+            sender.sendMessage(plugin.getLanguageManager().getMessage("cmd-only-players", true));
             return;
         }
         
@@ -155,12 +156,8 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
             plugin.getPartnerListener().toggleSpy(player.getUniqueId());
             boolean isSpying = plugin.getPartnerListener().isSpying(player.getUniqueId());
             
-            String status = isSpying ? colorize("&a&lENABLED") : colorize("&c&lDISABLED");
-            player.sendMessage(colorize("&7Spy mode: ") + status);
-            
-            if (isSpying) {
-                player.sendMessage(colorize("&7You can now see all partner chat messages."));
-            }
+            String status = isSpying ? plugin.getLanguageManager().getMessage("chat-spy-on", true) : plugin.getLanguageManager().getMessage("chat-spy-off", true);
+            player.sendMessage(status);
         } else {
             sender.sendMessage(colorize("&cUnknown toggle option: &e" + args[1]));
             playErrorSound(player);
@@ -168,7 +165,7 @@ public class PartnerAdminCommand implements CommandExecutor, TabCompleter {
     }
     
     private String getMsg(String key) {
-        return colorize(plugin.getConfig().getString("messages." + key, ""));
+        return plugin.getLanguageManager().getMessage(key, true);
     }
     
     @Override

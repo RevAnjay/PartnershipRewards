@@ -12,7 +12,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
 import static github.revanjay.partnershiprewards.PartnershipRewards.sendActionBar;
@@ -35,12 +34,12 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(colorize("&cThis command can only be used by players!"));
+            sender.sendMessage(plugin.getLanguageManager().getMessage("cmd-only-players", true));
             return true;
         }
         
         if (!player.hasPermission("partnershiprewards.use")) {
-            player.sendMessage(colorize("&cYou don't have permission!"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("cmd-no-permission", true));
             playErrorSound(player);
             return true;
         }
@@ -75,7 +74,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     
     private void handleRequest(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(colorize("&cUsage: /partner request <player>"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("cmd-usage-request", true));
             playErrorSound(player);
             return;
         }
@@ -395,13 +394,15 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         }
         String message = messageBuilder.toString().trim();
         Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
-        String chatFormat = colorize("&d[Partner] &f" + player.getName() + "&7: &f" + message);
+        String chatFormat = plugin.getLanguageManager().getMessage("chat-format")
+            .replace("{player}", player.getName())
+            .replace("{message}", message);
         player.sendMessage(chatFormat);
         if (partner != null) {
             partner.sendMessage(chatFormat);
             plugin.getPartnerListener().notifySpyingAdmins(player, partner, message);
         } else {
-            player.sendMessage(colorize("&7(Partner is offline, message not delivered)"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("chat-partner-offline", true));
         }
     }
     
@@ -553,7 +554,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             Location current = player.getLocation();
             if (current.getWorld() != startLoc.getWorld() || 
                 current.distanceSquared(startLoc) > 1.0) {
-                player.sendMessage(colorize("&cTeleport cancelled! You moved."));
+                player.sendMessage(plugin.getLanguageManager().getMessage("home-moved", true));
                 playErrorSound(player);
                 return;
             }
@@ -611,7 +612,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     }
     
     private String getMsg(String key) {
-        return colorize(plugin.getConfig().getString("messages." + key, ""));
+        return plugin.getLanguageManager().getMessage(key, true);
     }
     
     private String formatDuration(long seconds) {

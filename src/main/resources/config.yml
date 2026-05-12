@@ -1,3 +1,6 @@
+# Language selection (en, id, etc. - loaded from lang/ folder)
+language: en
+
 database:
   type: SQLITE
   mysql:
@@ -28,25 +31,25 @@ rewards:
       commands:
         - "give {player} diamond 5"
         - "give {partner} diamond 5"
-      broadcast: "&e{player} &7dan &e{partner} &7telah menjadi partner selama &61 hari&7!"
+      broadcast: "&e{player} &7and &e{partner} &7have been partners for &61 day&7!"
     2:
       days: 7
       commands:
         - "give {player} diamond 16"
         - "give {partner} diamond 16"
-      broadcast: "&e{player} &7dan &e{partner} &7telah menjadi partner selama &61 minggu&7!"
+      broadcast: "&e{player} &7and &e{partner} &7have been partners for &61 week&7!"
     3:
       days: 30
       commands:
         - "give {player} diamond 64"
         - "give {partner} diamond 64"
-      broadcast: "&e{player} &7dan &e{partner} &7telah menjadi partner selama &61 bulan&7!"
+      broadcast: "&e{player} &7and &e{partner} &7have been partners for &61 month&7!"
     4:
       days: 90
       commands:
         - "give {player} netherite_ingot 10"
         - "give {partner} netherite_ingot 10"
-      broadcast: "&e{player} &7dan &e{partner} &7telah menjadi partner selama &63 bulan&7!"
+      broadcast: "&e{player} &7and &e{partner} &7have been partners for &63 months&7!"
 
 # ============================================
 # Quest System Configuration
@@ -126,23 +129,23 @@ quest:
     # 🆕 FUN LIGHT QUESTS - Interesting activities
     THROW_SNOWBALL_AT_PARTNER:
       enabled: true
-      amount: [10, 20, 30]       # Lempar snowball ke partner!
+      amount: [10, 20, 30]       # Throw snowball at partner!
     
     THROW_EGG:
       enabled: true
-      amount: [10, 15, 25]       # Lempar telur
+      amount: [10, 15, 25]       # Throw egg
     
     EAT_CAKE:
       enabled: true
-      amount: [3, 5, 10]         # Makan kue bersama
+      amount: [3, 5, 10]         # Eat cake together
     
     DRINK_MILK:
       enabled: true
-      amount: [5, 10, 15]        # Minum susu
+      amount: [5, 10, 15]        # Drink milk
     
     LAUNCH_FIREWORK:
       enabled: true
-      amount: [10, 20, 30]       # Luncurkan kembang api
+      amount: [10, 20, 30]       # Launch firework
     
     # 🟡 Medium Performance Quests (moderate server impact)
     KILL_MOBS:
@@ -256,25 +259,25 @@ quest:
       enabled: true
       xp-reward: 250
       chance: 30              # 30% chance
-      amount: [5, 10, 15]     # Naik 5-15 level XP
+      amount: [5, 10, 15]     # Gain 5-15 XP levels
     
     MINE_DIAMOND_ORE:
       enabled: true
       xp-reward: 200
       chance: 25
-      amount: [10, 15, 20]    # Tambang 10-20 diamond ore
+      amount: [10, 15, 20]    # Mine 10-20 diamond ores
     
     MINE_DEEPSLATE_ORES:
       enabled: true
       xp-reward: 200
       chance: 35
-      amount: [20, 30, 50]    # Tambang 20-50 deepslate ore
+      amount: [20, 30, 50]    # Mine 20-50 deepslate ores
     
     KILL_WITHER_SKELETONS:
       enabled: true
       xp-reward: 300
       chance: 20
-      amount: [15, 25, 35]    # Bunuh 15-35 wither skeleton
+      amount: [15, 25, 35]    # Kill 15-35 wither skeletons
     
     SMELT_NETHERITE:
       enabled: true
@@ -317,53 +320,7 @@ level-rewards:
       - "give {partner} elytra 1"
     broadcast: "&d&lPartnership &5{player} &7& &5{partner} &8» &5&lLEVEL 25 &d&lMAX TIER!"
 
-messages:
-  # ═══════════════════════════════════════════════
-  # Prefix & Format
-  # ═══════════════════════════════════════════════
-  prefix: "&d&lPartnership &8» &r"
-  
-  # ═══════════════════════════════════════════════
-  # Partnership Request Messages
-  # ═══════════════════════════════════════════════
-  request-sent: "&aPartnership request sent to &e{player}&a!"
-  request-received: "&e{player} &7wants to be your partner!\\n&8   └ &7Type &f/partner accept {player} &7to accept"
-  partnership-formed: "&a&lACCEPTED! &7You are now partners with &e{player}&7!"
-  partnership-broken: "&c&lBROKEN! &7Partnership with &e{player} &7has ended."
-  
-  # ═══════════════════════════════════════════════
-  # Error Messages
-  # ═══════════════════════════════════════════════
-  no-partner: "&cYou don't have a partner."
-  already-partnered: "&cYou already have a partner!"
-  target-has-partner: "&e{player} &calready has a partner!"
-  no-pending-request: "&cNo pending request from &e{player}&c."
-  request-expired: "&cPartnership request has expired."
-  player-not-found: "&cPlayer &e{player} &cnot found."
-  player-not-online: "&e{player} &cmust be online!"
-  too-far: "&cYou are too far from &e{player}&c!"
-  cooldown: "&cWait &e{seconds} seconds &cmore."
-  cannot-partner-self: "&cYou can't partner with yourself!"
-  
-  # ═══════════════════════════════════════════════
-  # Info Messages
-  # ═══════════════════════════════════════════════
-  config-reloaded: "&aConfig reloaded successfully!"
-  partnership-info: "&6&lPARTNERSHIP INFO\\n&8┌─────────────────────────\\n&8│ &7Partner: &e{player}\\n&8│ &7Duration: &a{duration}\\n&8│ &7Since: &b{start_date}\\n&8└─────────────────────────"
-  no-partnerships: "&cNo active partnerships on the server."
-  
-  # ═══════════════════════════════════════════════
-  # Quest Messages
-  # ═══════════════════════════════════════════════
-  quest-complete: "&a&lQUEST COMPLETE! &7+&a{xp} XP"
-  new-quest: "&e&lNEW QUEST!\\n&8   └ &7{description}"
-  level-up: "&b&lLEVEL UP! &7Now &bLevel {level}"
-  quest-expired: "&cQuest expired! A new quest is being generated..."
-  
-  # ═══════════════════════════════════════════════
-  # Quest Progress (for listeners)
-  # ═══════════════════════════════════════════════
-  quest-progress: "&8[&a+{amount}&8] &7{current}&8/&7{required}"
+
 
 # ═══════════════════════════════════════════════════════
 # GIFT SYSTEM
@@ -409,7 +366,3 @@ login-streak:
   enabled: true
   base-bonus-xp: 25           # XP bonus per streak level
   max-streak: 7               # Max streak (7 days = 175 XP)
-  messages:
-    streak-continue: "&a&lStreak! &7Day &e{streak}&7! Bonus &b+{xp} XP"
-    streak-reset: "&cStreak reset! &7Login together with your partner to start a new streak."
-    waiting-partner: "&7Waiting for your partner to login today to continue the streak..."

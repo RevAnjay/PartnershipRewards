@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorizeComponent;
 
 import java.time.Instant;
 import java.util.List;
@@ -133,7 +134,7 @@ public class RewardManager {
                     .replace("{player}", p1Name)
                     .replace("{partner}", p2Name));
                 
-                Bukkit.broadcastMessage(message);
+                Bukkit.broadcast(colorizeComponent(message));
             }
         });
     }

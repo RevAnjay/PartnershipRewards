@@ -2,6 +2,8 @@ package github.revanjay.partnershiprewards.listener;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.Partnership;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -9,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
 
@@ -50,13 +51,13 @@ public class PartnerListener implements Listener {
         if (!partnership.isPvpEnabled()) {
             event.setCancelled(true);
             if (ThreadLocalRandom.current().nextInt(10) == 0) {
-                attacker.sendMessage(colorize("&d&lPartner &8» &7PvP with partner is disabled. Use &e/partner toggle pvp &7to enable."));
+                attacker.sendMessage(plugin.getLanguageManager().getMessage("pvp-denied", true));
             }
         }
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         
         if (!plugin.getChatManager().isChatToggled(player.getUniqueId())) return;
@@ -69,17 +70,19 @@ public class PartnerListener implements Listener {
         
         event.setCancelled(true);
         
-        String message = event.getMessage();
+        String message = PlainTextComponentSerializer.plainText().serialize(event.message());
         Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
         
-        String chatFormat = colorize("&d[Partner] &f" + player.getName() + "&7: &f" + message);
+        String chatFormat = plugin.getLanguageManager().getMessage("chat-format")
+            .replace("{player}", player.getName())
+            .replace("{message}", message);
         player.sendMessage(chatFormat);
         
         if (partner != null) {
             partner.sendMessage(chatFormat);
             notifySpyingAdmins(player, partner, message);
         } else {
-            player.sendMessage(colorize("&7(Partner is offline, message not delivered)"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("chat-partner-offline", true));
         }
     }
     
@@ -100,7 +103,10 @@ public class PartnerListener implements Listener {
     }
     
     public void notifySpyingAdmins(Player sender, Player receiver, String message) {
-        String spyFormat = colorize("&8[&cSPY&8] &d[Partner] &f" + sender.getName() + " &7→ &f" + receiver.getName() + "&7: " + message);
+        String spyFormat = plugin.getLanguageManager().getMessage("chat-spy-format")
+            .replace("{sender}", sender.getName())
+            .replace("{receiver}", receiver.getName())
+            .replace("{message}", message);
         
         for (UUID adminUuid : spyingAdmins) {
             Player admin = Bukkit.getPlayer(adminUuid);

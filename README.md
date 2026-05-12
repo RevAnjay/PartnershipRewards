@@ -7,35 +7,34 @@
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
 [![Version](https://img.shields.io/badge/Version-1.2.0-green.svg)](#)
 
+**A partnership system for Minecraft featuring quest-based leveling, gifts, shared homes, and rewards.**
 
-**Sistem partnership untuk Minecraft dengan quest-based leveling, gifts, home, dan rewards.**
-
-[Fitur](#-fitur) • [Instalasi](#-instalasi) • [Commands](#-commands) • [Permissions](#-permissions) • [Placeholders](#-placeholders) • [Konfigurasi](#%EF%B8%8F-konfigurasi) • [Build](#-build)
+[Features](#-features) • [Installation](#-installation) • [Commands](#-commands) • [Permissions](#-permissions) • [Placeholders](#-placeholders) • [Configuration](#%EF%B8%8F-configuration) • [Build](#-build)
 
 </div>
 
 ---
 
-## ✨ Fitur
+## ✨ Features
 
-- 💑 **Partnership System** — Ajak player lain menjadi partner dengan sistem request/accept
-- 📜 **39 Quest Types** — Dari quest ringan (makan, chat) sampai quest berat (bunuh boss, raid)
-- ⬆️ **Leveling System** — XP & level progression dengan formula kustom per-level
-- 🎁 **Gift System** — Kirim item ke partner, claim gifts dengan sistem pending
-- 🏠 **Partner Home** — Set, teleport, dan hapus home bersama (warmup & cooldown)
-- 🎁 **Milestone Rewards** — Reward otomatis berdasarkan durasi partnership dan level
-- 🏆 **Bonus Quests** — Quest langka dengan XP reward lebih tinggi
-- 💬 **Partner Chat** — Private chat khusus antar partner (toggle mode & direct message)
-- ⚔️ **PvP Toggle** — Toggle PvP protection antar partner
-- ✨ **Partner Effects** — Particle effects otomatis berdasarkan level (Heart, Happy, EndRod, Cherry)
-- 🔥 **Login Streak** — Daily login streak bersama partner untuk bonus XP
-- 🏷️ **Partner Titles** — Title otomatis berdasarkan level via PlaceholderAPI
-- 🕵️ **Admin Spy** — Admin bisa memantau partner chat
-- 🖥️ **Level GUI** — GUI inventory untuk melihat progress level
-- 📊 **Top Leaderboard** — Ranking partnership berdasarkan level
-- 🔗 **PlaceholderAPI Support** — 10 placeholders untuk scoreboard, chat, dll
-- 💾 **SQLite & MySQL** — Dual database support dengan HikariCP connection pooling
-- ⚡ **Async Operations** — Semua database operations berjalan async, zero main-thread blocking
+- 💑 **Partnership System** — Invite other players to become partners with a request/accept system
+- 📜 **39 Quest Types** — Ranging from light quests (eating, chatting) to heavy quests (boss kills, raids)
+- ⬆️ **Leveling System** — XP & level progression with custom formulas per level
+- 🎁 **Gift System** — Send items to partners and claim pending gifts
+- 🏠 **Partner Home** — Set, teleport, and delete a shared home (includes warmup & cooldown)
+- 🎁 **Milestone Rewards** — Automated rewards based on partnership duration and level
+- 🏆 **Bonus Quests** — Rare quests offering higher XP rewards
+- 💬 **Partner Chat** — Private chat exclusively for partners (toggle mode & direct message)
+- ⚔️ **PvP Toggle** — Toggle PvP protection between partners
+- ✨ **Partner Effects** — Automated particle effects based on level (Heart, Happy, EndRod, Cherry)
+- 🔥 **Login Streak** — Daily shared login streak for bonus XP
+- 🏷️ **Partner Titles** — Automated titles based on level via PlaceholderAPI
+- 🕵️ **Admin Spy** — Admins can monitor partner chats
+- 🖥️ **Level GUI** — Inventory GUI to view level progress
+- 📊 **Top Leaderboard** — Partnership ranking based on level
+- 🔗 **PlaceholderAPI Support** — 10 placeholders for scoreboards, chat, etc.
+- 💾 **SQLite & MySQL** — Dual database support with HikariCP connection pooling
+- ⚡ **Async Operations** — All database operations run asynchronously for zero main-thread blocking
 
 ## 📋 Requirements
 
@@ -44,185 +43,185 @@
 
 ### Optional Dependencies
 
-- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) — Untuk placeholders & partner titles
+- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) — For placeholders & partner titles
 
-## 📥 Instalasi
+## 📥 Installation
 
-1. Download JAR dari [Releases](https://github.com/revanjay/PartnershipRewards/releases)
-2. Taruh file `.jar` di folder `plugins/`
-3. Restart server
+1. Download the JAR from [Releases](https://github.com/revanjay/PartnershipRewards/releases)
+2. Place the `.jar` file in your `plugins/` folder
+3. Restart the server
 4. Edit `plugins/PartnershipRewards/config.yml`
-5. Jalankan `/partneradmin reload`
+5. Run `/partneradmin reload`
 
 ## 📝 Commands
 
 ### Player Commands
 
-| Command | Alias | Deskripsi |
-|---------|-------|-----------|
-| `/partner request <player>` | | Kirim permintaan partnership |
-| `/partner accept` | | Terima permintaan |
-| `/partner reject` | | Tolak permintaan |
-| `/partner break` | | Putuskan partnership |
-| `/partner info` | | Lihat info partnership |
-| `/partner quest` | | Lihat quest aktif |
-| `/partner level` | `/partner gui` | Buka GUI level progress |
-| `/partner chat [pesan]` | | Toggle chat mode / kirim pesan ke partner |
-| `/partner gift` | | Kirim item yang dipegang ke partner |
-| `/partner gifts` | | Claim gifts dari partner |
-| `/partner sethome` | | Set partner home (min level required) |
-| `/partner home` | | Teleport ke partner home |
-| `/partner delhome` | | Hapus partner home |
-| `/partner toggle pvp` | | Toggle PvP antar partner |
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `/partner request <player>` | | Send a partnership request |
+| `/partner accept` | | Accept a request |
+| `/partner reject` | | Reject a request |
+| `/partner break` | | Break the partnership |
+| `/partner info` | | View partnership info |
+| `/partner quest` | | View active quests |
+| `/partner level` | `/partner gui` | Open the level progress GUI |
+| `/partner chat [message]` | | Toggle chat mode or send a direct message to partner |
+| `/partner gift` | | Send the currently held item to your partner |
+| `/partner gifts` | | Claim pending gifts from your partner |
+| `/partner sethome` | | Set the partner home (min level required) |
+| `/partner home` | | Teleport to the partner home |
+| `/partner delhome` | | Delete the partner home |
+| `/partner toggle pvp` | | Toggle PvP between partners |
 | `/partner toggle effects` | | Toggle particle effects |
-| `/partner top` | | Lihat top 10 partnership |
-| `/partner list` | | Lihat semua partnerships (admin only) |
+| `/partner top` | | View the top 10 partnerships |
+| `/partner list` | | View all active partnerships (admin only) |
 
-> **Tip:** `/partner` juga bisa diakses via `/p` atau `/partnership`
+> **Tip:** `/partner` can also be accessed via `/p` or `/partnership`
 
 ### Admin Commands
 
-| Command | Deskripsi |
-|---------|-----------|
-| `/partneradmin reload` | Reload config |
-| `/partneradmin reset <player>` | Reset partnership player |
-| `/partneradmin set <p1> <p2>` | Buat partnership paksa |
-| `/partneradmin toggle spy` | Toggle spy mode partner chat |
+| Command | Description |
+|---------|-------------|
+| `/partneradmin reload` | Reload the configuration |
+| `/partneradmin reset <player>` | Reset a player's partnership |
+| `/partneradmin set <p1> <p2>` | Forcefully create a partnership |
+| `/partneradmin toggle spy` | Toggle partner chat spy mode |
 
-> **Tip:** `/partneradmin` juga bisa diakses via `/pa` atau `/padmin`
+> **Tip:** `/partneradmin` can also be accessed via `/pa` or `/padmin`
 
 ## 🔑 Permissions
 
-| Permission | Deskripsi | Default |
-|------------|-----------|---------|
-| `partnershiprewards.use` | Gunakan partner commands | `true` |
-| `partnershiprewards.admin` | Admin commands + `/partner list` | `op` |
+| Permission | Description | Default |
+|------------|-------------|---------|
+| `partnershiprewards.use` | Use player partner commands | `true` |
+| `partnershiprewards.admin` | Use admin commands + `/partner list` | `op` |
 
 ## 🔗 Placeholders
 
-Memerlukan [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/). Semua placeholder menggunakan prefix `%partner_`.
+Requires [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/). All placeholders use the `%partner_` prefix.
 
-| Placeholder | Output | Contoh |
-|-------------|--------|--------|
-| `%partner_name%` | Nama partner | `Steve` |
-| `%partner_level%` | Level partnership | `15` |
-| `%partner_xp%` | XP saat ini | `450` |
-| `%partner_duration%` | Durasi partnership | `7d 3h` |
-| `%partner_days%` | Jumlah hari partnership | `7` |
-| `%partner_online%` | Status partner | `Online` / `Offline` |
-| `%partner_title%` | Title berdasarkan level | `[Soulmate]` |
-| `%partner_quest%` | Deskripsi quest aktif | `Kill 20 Zombies` |
-| `%partner_streak%` | Login streak saat ini | `5` |
-| `%partner_has_partner%` | Punya partner atau tidak | `true` / `false` |
+| Placeholder | Output | Example |
+|-------------|--------|---------|
+| `%partner_name%` | Partner's name | `Steve` |
+| `%partner_level%` | Partnership level | `15` |
+| `%partner_xp%` | Current XP | `450` |
+| `%partner_duration%` | Partnership duration | `7d 3h` |
+| `%partner_days%` | Partnership duration in days | `7` |
+| `%partner_online%` | Partner's status | `Online` / `Offline` |
+| `%partner_title%` | Title based on level | `[Soulmate]` |
+| `%partner_quest%` | Active quest description | `Kill 20 Zombies` |
+| `%partner_streak%` | Current login streak | `5` |
+| `%partner_has_partner%` | Whether the player has a partner | `true` / `false` |
 
-## ⚙️ Konfigurasi
+## ⚙️ Configuration
 
 <details>
-<summary>Klik untuk melihat config sections</summary>
+<summary>Click to view configuration sections</summary>
 
-File konfigurasi lengkap akan di-generate otomatis saat pertama kali plugin dijalankan di `plugins/PartnershipRewards/config.yml`.
+A full configuration file is automatically generated in `plugins/PartnershipRewards/config.yml` on the first run.
 
-Konfigurasi mencakup:
+Configuration includes:
 
 ### Database
-- Pilihan **SQLite** (default) atau **MySQL**
+- Choose between **SQLite** (default) or **MySQL**
 - HikariCP connection pool settings
 
 ### Quest System
-- **39 tipe quest** yang bisa di-enable/disable per-tipe
-- XP per quest, reset hours, cooldown
-- Custom XP requirement per level (override formula)
+- **39 quest types** that can be toggled individually
+- XP per quest, reset hours, cooldowns
+- Custom XP requirements per level (overriding the formula)
 - Max level configuration
-- Bonus quests dengan custom chance% dan XP reward
+- Bonus quests with custom percentage chances and XP rewards
 
 ### Level Rewards
-- Reward kustom per level (commands + broadcast)
+- Custom rewards per level (commands + broadcasts)
 
 ### Gift System
 - Max pending gifts per player
 
 ### Partner Effects
-- Particle effects berdasarkan level (Heart ≥1, Happy ≥5, EndRod ≥15, Cherry ≥25)
-- Interval ticks & max distance
+- Particle effects based on level (Heart ≥1, Happy ≥5, EndRod ≥15, Cherry ≥25)
+- Interval ticks & max distance limits
 - Toggle per-partnership
 
 ### Partner Titles
-- Title otomatis berdasarkan level via PlaceholderAPI
-- Custom format & per-level title names
+- Automated titles based on level via PlaceholderAPI
+- Custom formats & per-level title names
 
 ### Partner Home
-- Minimum level untuk set home
-- Warmup seconds (harus diam sebelum teleport)
-- Cooldown seconds antar teleport
+- Minimum level to set a home
+- Warmup seconds (stand still before teleportation)
+- Cooldown seconds between teleports
 
 ### Login Streak
 - Base bonus XP per streak level
-- Max streak (default 7 hari)
+- Max streak (default 7 days)
 - Custom messages
 
 ### Messages
-- Semua pesan bisa dikustomisasi (prefix, requests, errors, quests, progress)
+- All messages are fully customizable (prefixes, requests, errors, quests, progress)
 
 </details>
 
 ## 🎯 Quest Types
 
 <details>
-<summary>Klik untuk melihat semua 39 quest types</summary>
+<summary>Click to view all 39 quest types</summary>
 
 #### 🟢 Light Quests (Low Impact)
-| Quest | Deskripsi |
-|-------|-----------|
-| `GIVE_ITEM` | Berikan item ke partner |
-| `SEND_MESSAGE` | Kirim pesan di chat |
-| `USE_COMMAND` | Gunakan command tertentu |
-| `EAT_FOOD` | Makan bersama |
-| `SLEEP_TOGETHER` | Tidur bersama partner |
-| `FISH_CATCH` | Memancing ikan |
-| `TRADE_VILLAGER` | Trading dengan villager |
-| `ENCHANT_ITEM` | Enchant item |
-| `ANVIL_USE` | Gunakan anvil |
-| `BREW_POTION` | Brew potion |
-| `THROW_SNOWBALL_AT_PARTNER` | Lempar snowball ke partner |
-| `THROW_EGG` | Lempar telur |
-| `EAT_CAKE` | Makan kue bersama |
-| `DRINK_MILK` | Minum susu |
-| `LAUNCH_FIREWORK` | Luncurkan kembang api |
+| Quest | Description |
+|-------|-------------|
+| `GIVE_ITEM` | Give items to your partner |
+| `SEND_MESSAGE` | Send messages in chat |
+| `USE_COMMAND` | Use a specific command |
+| `EAT_FOOD` | Eat food together |
+| `SLEEP_TOGETHER` | Sleep in beds with your partner |
+| `FISH_CATCH` | Catch fish |
+| `TRADE_VILLAGER` | Trade with villagers |
+| `ENCHANT_ITEM` | Enchant items |
+| `ANVIL_USE` | Use anvils |
+| `BREW_POTION` | Brew potions |
+| `THROW_SNOWBALL_AT_PARTNER` | Throw snowballs at your partner |
+| `THROW_EGG` | Throw eggs |
+| `EAT_CAKE` | Eat cake together |
+| `DRINK_MILK` | Drink milk |
+| `LAUNCH_FIREWORK` | Launch fireworks |
 
 #### 🟡 Medium Quests (Moderate Impact)
-| Quest | Deskripsi |
-|-------|-----------|
-| `KILL_MOBS` | Bunuh mob bersama partner |
-| `CRAFT_ITEM` | Craft item tertentu |
-| `PLACE_BLOCKS` | Pasang block |
-| `HARVEST_CROPS` | Panen tanaman |
-| `TAME_ANIMAL` | Jinakkan hewan |
-| `BREED_ANIMAL` | Breeding hewan |
-| `SMELT_ITEMS` | Smelt di furnace |
-| `SHOOT_ARROWS` | Tembak panah |
-| `SHEAR_SHEEP` | Cukur domba |
-| `USE_ENDER_PEARL` | Gunakan ender pearl |
-| `KILL_WITH_BOW` | Kill mob dengan bow |
-| `DAMAGE_EACH_OTHER` | Sparring dengan partner |
-| `VISIT_NETHER` | Kunjungi Nether bersama |
-| `RIDE_TOGETHER` | Naik boat/minecart bersama |
+| Quest | Description |
+|-------|-------------|
+| `KILL_MOBS` | Kill mobs together |
+| `CRAFT_ITEM` | Craft specific items |
+| `PLACE_BLOCKS` | Place blocks |
+| `HARVEST_CROPS` | Harvest crops |
+| `TAME_ANIMAL` | Tame animals |
+| `BREED_ANIMAL` | Breed animals |
+| `SMELT_ITEMS` | Smelt items in a furnace |
+| `SHOOT_ARROWS` | Shoot arrows |
+| `SHEAR_SHEEP` | Shear sheep |
+| `USE_ENDER_PEARL` | Use ender pearls |
+| `KILL_WITH_BOW` | Kill mobs with a bow |
+| `DAMAGE_EACH_OTHER` | Spar with your partner |
+| `VISIT_NETHER` | Visit the Nether together |
+| `RIDE_TOGETHER` | Ride a boat/minecart together |
 
 #### 🔴 Heavy Quests (Optimized)
-| Quest | Deskripsi |
-|-------|-----------|
-| `BREAK_BLOCKS` | Hancurkan block bersama |
-| `PLAY_TOGETHER` | Main bersama partner (waktu) |
+| Quest | Description |
+|-------|-------------|
+| `BREAK_BLOCKS` | Break natural blocks together |
+| `PLAY_TOGETHER` | Play online together for a set duration |
 
 #### 🏆 Bonus Quests (Rare + Higher XP)
-| Quest | Default XP | Deskripsi |
-|-------|-----------|-----------|
-| `KILL_BOSS` | 500 | Kill Ender Dragon/Wither/Elder Guardian |
-| `MINE_ANCIENT_DEBRIS` | 300 | Tambang ancient debris |
-| `COMPLETE_RAID` | 400 | Selesaikan raid bersama |
-| `EARN_XP_LEVELS` | 250 | Naik XP level |
-| `MINE_DIAMOND_ORE` | 200 | Tambang diamond ore |
-| `MINE_DEEPSLATE_ORES` | 200 | Tambang deepslate ore |
-| `KILL_WITHER_SKELETONS` | 300 | Kill wither skeleton |
+| Quest | Default XP | Description |
+|-------|------------|-------------|
+| `KILL_BOSS` | 500 | Kill an Ender Dragon, Wither, or Elder Guardian |
+| `MINE_ANCIENT_DEBRIS` | 300 | Mine ancient debris |
+| `COMPLETE_RAID` | 400 | Complete a village raid together |
+| `EARN_XP_LEVELS` | 250 | Earn XP levels |
+| `MINE_DIAMOND_ORE` | 200 | Mine diamond ores |
+| `MINE_DEEPSLATE_ORES` | 200 | Mine deepslate ores |
+| `KILL_WITHER_SKELETONS` | 300 | Kill wither skeletons |
 | `SMELT_NETHERITE` | 400 | Smelt netherite scrap |
 
 </details>
@@ -237,7 +236,7 @@ cd PartnershipRewards
 
 Output JAR: `build/libs/PartnershipRewards-x.jar`
 
-## 📁 Struktur Project
+## 📁 Project Structure
 
 ```
 src/main/java/github/revanjay/partnershiprewards/
@@ -254,8 +253,8 @@ src/main/java/github/revanjay/partnershiprewards/
 
 ## 📦 Dependencies
 
-| Library | Tipe | Deskripsi |
-|---------|------|-----------|
+| Library | Type | Description |
+|---------|------|-------------|
 | Paper API 1.20.1 | compileOnly | Server API |
 | Lombok 1.18.46 | compileOnly | Annotation processor |
 | PlaceholderAPI 2.12.2 | compileOnly (optional) | Placeholder support |

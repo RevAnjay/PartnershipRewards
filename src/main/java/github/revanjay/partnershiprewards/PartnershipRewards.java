@@ -10,17 +10,18 @@ import github.revanjay.partnershiprewards.listener.QuestListener;
 import github.revanjay.partnershiprewards.manager.*;
 import github.revanjay.partnershiprewards.task.PlayTogetherTask;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bstats.bukkit.Metrics;
 
 @Getter
 public class PartnershipRewards extends JavaPlugin {
     
+    private LanguageManager languageManager;
     private DatabaseManager databaseManager;
     private PartnershipManager partnershipManager;
     private RewardManager rewardManager;
@@ -41,11 +42,17 @@ public class PartnershipRewards extends JavaPlugin {
     }
     
     public static String colorize(String msg) {
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return LegacyComponentSerializer.legacySection().serialize(
+            LegacyComponentSerializer.legacyAmpersand().deserialize(msg)
+        );
+    }
+    
+    public static Component colorizeComponent(String msg) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(msg);
     }
     
     public static void sendActionBar(Player player, String message) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(colorize(message)));
+        player.sendActionBar(colorizeComponent(message));
     }
     
     public static void playErrorSound(Player player) {
@@ -55,6 +62,10 @@ public class PartnershipRewards extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        ConfigUpdater.updateConfig(this);
+        
+        int pluginId = 31270;
+        Metrics metrics = new Metrics(this, pluginId);
         
         initializeManagers();
         registerCommands();
@@ -62,7 +73,7 @@ public class PartnershipRewards extends JavaPlugin {
         startTasks();
         registerHooks();
         
-        getLogger().info("PartnershipRewards v" + getDescription().getVersion() + " has been enabled!");
+        getLogger().info("PartnershipRewards v" + getPluginMeta().getVersion() + " has been enabled!");
     }
     
     @Override
@@ -91,6 +102,7 @@ public class PartnershipRewards extends JavaPlugin {
     }
     
     private void initializeManagers() {
+        this.languageManager = new LanguageManager(this);
         this.databaseManager = new DatabaseManager(this);
         this.databaseManager.initialize();
         

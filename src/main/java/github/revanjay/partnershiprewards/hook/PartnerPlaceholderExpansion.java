@@ -10,7 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Instant;
+
 import java.util.UUID;
 
 public class PartnerPlaceholderExpansion extends PlaceholderExpansion {
@@ -28,12 +28,12 @@ public class PartnerPlaceholderExpansion extends PlaceholderExpansion {
     
     @Override
     public @NotNull String getAuthor() {
-        return plugin.getDescription().getAuthors().toString();
+        return plugin.getPluginMeta().getAuthors().toString();
     }
     
     @Override
     public @NotNull String getVersion() {
-        return plugin.getDescription().getVersion();
+        return plugin.getPluginMeta().getVersion();
     }
     
     @Override

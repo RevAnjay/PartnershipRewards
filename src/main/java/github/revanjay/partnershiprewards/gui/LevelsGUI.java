@@ -3,6 +3,7 @@ package github.revanjay.partnershiprewards.gui;
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.ActiveQuest;
 import github.revanjay.partnershiprewards.model.Partnership;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorizeComponent;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -31,13 +33,11 @@ public class LevelsGUI implements InventoryHolder, Listener {
     private final Partnership partnership;
     private final Inventory inventory;
     
-    private static final String GUI_TITLE = colorize("&6&lPartnership Level");
-    
     public LevelsGUI(PartnershipRewards plugin, Player viewer, Partnership partnership) {
         this.plugin = plugin;
         this.viewer = viewer;
         this.partnership = partnership;
-        this.inventory = Bukkit.createInventory(this, 27, GUI_TITLE);
+        this.inventory = Bukkit.createInventory(this, 27, colorizeComponent(plugin.getLanguageManager().getMessage("gui-title")));
         Bukkit.getPluginManager().registerEvents(this, plugin);
         
         setupItems();
@@ -58,7 +58,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         inventory.setItem(20, createQuestProgressItem());
         inventory.setItem(21, createTimeItem());
         inventory.setItem(22, createNextRewardItem());
-        inventory.setItem(26, createItem(Material.BARRIER, colorize("&c&lClose"), Arrays.asList(colorize("&7Click to close"))));
+        inventory.setItem(26, createItem(Material.BARRIER, plugin.getLanguageManager().getMessage("gui-close"), Arrays.asList(plugin.getLanguageManager().getMessage("gui-click-close"))));
     }
     
     private ItemStack createPlayerHead(UUID uuid, String name) {
@@ -66,7 +66,7 @@ public class LevelsGUI implements InventoryHolder, Listener {
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         if (meta != null) {
             meta.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
-            meta.setDisplayName(colorize("&e&lPartner: &f" + name));
+            meta.displayName(colorizeComponent(plugin.getLanguageManager().getMessage("gui-partner-name").replace("{player}", name)));
             
             long durationDays = partnership.getDurationInDays();
             String duration = formatDuration(partnership.getDurationInSeconds());
@@ -74,11 +74,11 @@ public class LevelsGUI implements InventoryHolder, Listener {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             String startDate = sdf.format(new Date(partnership.getStartedAt() * 1000));
             
-            meta.setLore(Arrays.asList(
-                "",
-                colorize("&7Duration: &a" + duration),
-                colorize("&7Since: &b" + startDate),
-                colorize("&7Days: &e" + durationDays + " days")
+            meta.lore(Arrays.asList(
+                colorizeComponent(""),
+                colorizeComponent(plugin.getLanguageManager().getMessage("gui-duration").replace("{duration}", duration)),
+                colorizeComponent(plugin.getLanguageManager().getMessage("gui-since").replace("{date}", startDate)),
+                colorizeComponent(plugin.getLanguageManager().getMessage("gui-days").replace("{days}", String.valueOf(durationDays)))
             ));
             head.setItemMeta(meta);
         }
@@ -97,18 +97,18 @@ public class LevelsGUI implements InventoryHolder, Listener {
         
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add(colorize("&7Current XP: &b" + xp));
-        lore.add(colorize("&7Required XP: &e" + requiredXp));
+        lore.add(plugin.getLanguageManager().getMessage("gui-current-xp").replace("{xp}", String.valueOf(xp)));
+        lore.add(plugin.getLanguageManager().getMessage("gui-required-xp").replace("{xp}", String.valueOf(requiredXp)));
         lore.add("");
         
         if (level >= maxLevel) {
-            lore.add(colorize("&a&lMAX LEVEL"));
+            lore.add(plugin.getLanguageManager().getMessage("gui-max-level"));
         } else {
             int percentage = requiredXp > 0 ? (xp * 100) / requiredXp : 100;
-            lore.add(colorize("&7Progress: &a" + percentage + "%"));
+            lore.add(plugin.getLanguageManager().getMessage("gui-progress").replace("{percent}", String.valueOf(percentage)));
         }
         
-        return createItem(material, colorize("&6&lLevel " + level), lore);
+        return createItem(material, plugin.getLanguageManager().getMessage("gui-level").replace("{level}", String.valueOf(level)), lore);
     }
     
     private void createXpProgressBar() {
@@ -129,20 +129,15 @@ public class LevelsGUI implements InventoryHolder, Listener {
         if (quest == null) {
             if (plugin.getQuestManager().isOnQuestCooldown(partnership)) {
                 long remaining = plugin.getQuestManager().getQuestCooldownRemaining(partnership);
-                return createItem(Material.CLOCK, colorize("&c&lCooldown Active"), Arrays.asList(
+                return createItem(Material.CLOCK, plugin.getLanguageManager().getMessage("gui-cooldown"), Arrays.asList(
                     "",
-                    colorize("&7New quest available in:"),
-                    colorize("&e" + remaining + " minutes"),
-                    "",
-                    colorize("&8Complete quests to"),
-                    colorize("&8earn XP!")
+                    plugin.getLanguageManager().getMessage("gui-cooldown-wait"),
+                    plugin.getLanguageManager().getMessage("gui-cooldown-mins").replace("{mins}", String.valueOf(remaining))
                 ));
             }
-            return createItem(Material.PAPER, colorize("&a&lQuest Available!"), Arrays.asList(
+            return createItem(Material.PAPER, plugin.getLanguageManager().getMessage("gui-quest-active"), Arrays.asList(
                 "",
-                colorize("&7You can get a new quest!"),
-                colorize("&7Use &e/partner quest &7to"),
-                colorize("&7generate a new quest.")
+                plugin.getLanguageManager().getMessage("gui-cooldown-wait")
             ));
         }
         Material material = quest.getQuestType().isBonusQuest() ? Material.GOLDEN_APPLE : Material.PAPER;
@@ -158,12 +153,14 @@ public class LevelsGUI implements InventoryHolder, Listener {
         
         return createItem(material, prefix + quest.getQuestType().getDisplayName(), Arrays.asList(
             "",
-            colorize("&7" + quest.getFormattedDescription()),
+            plugin.getLanguageManager().getMessage("gui-quest-desc").replace("{desc}", quest.getFormattedDescription()),
             "",
-            colorize("&7Progress: ") + quest.getProgressBar(),
-            colorize("&7Done: &e" + progress + "&7/&e" + required + " &8(&a" + percentage + "%&8)"),
+            quest.getProgressBar(),
+            plugin.getLanguageManager().getMessage("gui-quest-prog")
+                .replace("{current}", String.valueOf(progress))
+                .replace("{required}", String.valueOf(required)),
             "",
-            colorize("&7Reward: &b+" + xpReward + " XP")
+            plugin.getLanguageManager().getMessage("gui-quest-reward").replace("{xp}", String.valueOf(xpReward))
         ));
     }
     
@@ -263,9 +260,9 @@ public class LevelsGUI implements InventoryHolder, Listener {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(name);
+            meta.displayName(colorizeComponent(name));
             if (lore != null) {
-                meta.setLore(lore);
+                meta.lore(lore.stream().map(PartnershipRewards::colorizeComponent).toList());
             }
             item.setItemMeta(meta);
         }

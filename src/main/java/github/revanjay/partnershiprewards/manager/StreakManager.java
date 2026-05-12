@@ -10,7 +10,6 @@ import static github.revanjay.partnershiprewards.PartnershipRewards.sendActionBa
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.UUID;
 
 public class StreakManager {
     
@@ -51,10 +50,9 @@ public class StreakManager {
                 processStreak(partnership, player, today);
             } else {
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    String msg = plugin.getConfig().getString("login-streak.messages.waiting-partner",
-                        "&7Waiting for your partner to login today to continue the streak...");
-                    player.sendMessage(colorize(msg));
-                    sendActionBar(player, "&7Waiting for partner...");
+                    String msg = plugin.getLanguageManager().getMessage("waiting-partner", true);
+                    player.sendMessage(msg);
+                    sendActionBar(player, plugin.getLanguageManager().getMessage("waiting-partner-action"));
                 });
             }
         });
@@ -86,25 +84,24 @@ public class StreakManager {
         Bukkit.getScheduler().runTask(plugin, () -> {
             plugin.getQuestManager().addBonusXp(partnership, bonusXp);
             
-            String streakMsg = plugin.getConfig().getString("login-streak.messages.streak-continue",
-                "&a&lStreak &7Day &e{streak}&7! Bonus &b+{xp} XP");
-            streakMsg = streakMsg.replace("{streak}", String.valueOf(newStreak))
-                                 .replace("{xp}", String.valueOf(bonusXp));
+            String streakMsg = plugin.getLanguageManager().getMessage("streak-continue", true)
+                .replace("{streak}", String.valueOf(newStreak))
+                .replace("{xp}", String.valueOf(bonusXp));
             
-            String formattedMsg = colorize(streakMsg);
-            
-            player.sendMessage(formattedMsg);
-            sendActionBar(player, "&a&lStreak &7Day &e" + newStreak + " &7| &b+" + bonusXp + " XP");
+            player.sendMessage(streakMsg);
+            sendActionBar(player, plugin.getLanguageManager().getMessage("streak-action")
+                .replace("{streak}", String.valueOf(newStreak))
+                .replace("{xp}", String.valueOf(bonusXp)));
             
             Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
             if (partner != null) {
-                partner.sendMessage(formattedMsg);
-                sendActionBar(partner, "&a&lStreak &7Day &e" + newStreak + " &7| &b+" + bonusXp + " XP");
+                partner.sendMessage(streakMsg);
+                sendActionBar(partner, plugin.getLanguageManager().getMessage("streak-action")
+                    .replace("{streak}", String.valueOf(newStreak))
+                    .replace("{xp}", String.valueOf(bonusXp)));
             }
         });
     }
     
-    private String getMsg(String key) {
-        return colorize(plugin.getConfig().getString("messages." + key, ""));
-    }
+
 }

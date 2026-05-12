@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+
 import static github.revanjay.partnershiprewards.PartnershipRewards.sendActionBar;
 
 public class PlayTogetherTask extends BukkitRunnable {
@@ -50,7 +50,9 @@ public class PlayTogetherTask extends BukkitRunnable {
                 1
             );
             if (!completed && quest.getProgress() % 5 == 0 && quest.getProgress() > 0) {
-                String actionBarMsg = "&d&lPlaying Together &e" + quest.getProgress() + "/" + quest.getRequiredAmount() + " min";
+                String actionBarMsg = plugin.getLanguageManager().getMessage("quest-action-play")
+                    .replace("{current}", String.valueOf(quest.getProgress()))
+                    .replace("{required}", String.valueOf(quest.getRequiredAmount()));
                 
                 sendActionBar(player, actionBarMsg);
                 sendActionBar(partner, actionBarMsg);

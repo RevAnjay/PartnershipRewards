@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.block.Block;
+
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,7 +28,7 @@ import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.raid.RaidFinishEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
+
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -60,12 +60,12 @@ public class QuestListener implements Listener {
         
         if (itemInHand.getType().name().equalsIgnoreCase(quest.getTarget())) {
             plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.GIVE_ITEM, 1);
-            player.sendMessage(colorize("&a+1 progress untuk memberikan " + quest.getTarget() + "!"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("quest-progress-give", true).replace("{item}", quest.getTarget()));
         }
     }
     
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onAsyncChat(AsyncPlayerChatEvent event) {
+    public void onAsyncChat(io.papermc.paper.event.player.AsyncChatEvent event) {
         UUID playerUuid = event.getPlayer().getUniqueId();
         
         if (!plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.SEND_MESSAGE)) return;

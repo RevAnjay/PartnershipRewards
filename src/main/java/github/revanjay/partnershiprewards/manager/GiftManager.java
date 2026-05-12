@@ -91,7 +91,7 @@ public class GiftManager {
             
             if (gifts.isEmpty()) {
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    player.sendMessage(colorize("&7No pending gifts."));
+                    player.sendMessage(plugin.getLanguageManager().getMessage("gift-no-pending", true));
                 });
                 return;
             }
@@ -113,7 +113,7 @@ public class GiftManager {
                         player.sendMessage(colorize("&a+ &7Gift from &e" + senderName + "&7: &f" + item.getType().name() + " x" + item.getAmount()));
                         claimed++;
                     } else {
-                        player.sendMessage(colorize("&cInventory full! Remaining gifts cannot be claimed."));
+                        player.sendMessage(plugin.getLanguageManager().getMessage("gift-inventory-full", true));
                         playErrorSound(player);
                         break;
                     }
@@ -160,6 +160,6 @@ public class GiftManager {
     }
     
     private String getMsg(String key) {
-        return colorize(plugin.getConfig().getString("messages." + key, ""));
+        return plugin.getLanguageManager().getMessage(key, true);
     }
 }

@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
+import static github.revanjay.partnershiprewards.PartnershipRewards.colorizeComponent;
 
 import java.time.Instant;
 import java.util.*;
@@ -419,14 +420,14 @@ public class QuestManager {
                     String message = colorize(broadcast
                         .replace("{player}", name1)
                         .replace("{partner}", name2));
-                    Bukkit.broadcastMessage(message);
+                    Bukkit.broadcast(colorizeComponent(message));
                 }
             });
         });
     }
     
         private void notifyQuestComplete(Partnership partnership, int xpReward) {
-        String message = colorize("&a&lQuest Complete! &7+" + xpReward + " XP");
+        String message = plugin.getLanguageManager().getMessage("quest-complete", true).replace("{xp}", String.valueOf(xpReward));
         
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
@@ -439,17 +440,33 @@ public class QuestManager {
         ActiveQuest quest = questCache.get(partnership.getId());
         if (quest == null) return;
         
-        String message = colorize("&e&lNew Quest! &7" + quest.getFormattedDescription());
+        String message = plugin.getLanguageManager().getMessage("new-quest", true).replace("{description}", quest.getFormattedDescription());
         
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
         if (p1 != null) {
             p1.sendMessage(message);
-            p1.sendTitle(colorize("&e&lNew Quest!"), colorize("&7" + quest.getQuestType().getDisplayName()), 10, 60, 20);
+            p1.showTitle(net.kyori.adventure.title.Title.title(
+                colorizeComponent(plugin.getLanguageManager().getMessage("quest-title")),
+                colorizeComponent("&7" + quest.getQuestType().getDisplayName()),
+                net.kyori.adventure.title.Title.Times.times(
+                    java.time.Duration.ofMillis(500),
+                    java.time.Duration.ofMillis(3000),
+                    java.time.Duration.ofMillis(1000)
+                )
+            ));
         }
         if (p2 != null) {
             p2.sendMessage(message);
-            p2.sendTitle(colorize("&e&lNew Quest!"), colorize("&7" + quest.getQuestType().getDisplayName()), 10, 60, 20);
+            p2.showTitle(net.kyori.adventure.title.Title.title(
+                colorizeComponent(plugin.getLanguageManager().getMessage("quest-title")),
+                colorizeComponent("&7" + quest.getQuestType().getDisplayName()),
+                net.kyori.adventure.title.Title.Times.times(
+                    java.time.Duration.ofMillis(500),
+                    java.time.Duration.ofMillis(3000),
+                    java.time.Duration.ofMillis(1000)
+                )
+            ));
         }
     }
     
