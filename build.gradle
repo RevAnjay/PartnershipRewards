@@ -33,6 +33,7 @@ tasks.withType(JavaCompile) {
 }
 
 shadowJar {
+    archiveClassifier.set('')
     relocate 'org.bstats', 'github.revanjay.partnershiprewards.bstats'
     mergeServiceFiles()
 }
