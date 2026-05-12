@@ -235,7 +235,7 @@ cd PartnershipRewards
 ./gradlew build
 ```
 
-Output JAR: `build/libs/PartnershipRewards-1.2.0.jar`
+Output JAR: `build/libs/PartnershipRewards-x.jar`
 
 ## 📁 Struktur Project
 
@@ -257,7 +257,7 @@ src/main/java/github/revanjay/partnershiprewards/
 | Library | Tipe | Deskripsi |
 |---------|------|-----------|
 | Paper API 1.20.1 | compileOnly | Server API |
-| Lombok 1.18.38 | compileOnly | Annotation processor |
+| Lombok 1.18.46 | compileOnly | Annotation processor |
 | PlaceholderAPI 2.12.2 | compileOnly (optional) | Placeholder support |
 | HikariCP 5.0.1 | bundled | Connection pooling |
 | SQLite JDBC 3.42.0.0 | bundled | SQLite driver |
