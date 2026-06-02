@@ -73,7 +73,29 @@ public class PartnershipRewards extends JavaPlugin {
         startTasks();
         registerHooks();
         
-        getLogger().info("PartnershipRewards v" + getPluginMeta().getVersion() + " has been enabled!");
+        // Startup banner
+        getLogger().info("");
+        getLogger().info("██████╗  █████╗ ██████╗ ████████╗███╗   ██╗███████╗██████╗ ███████╗██╗  ██╗██╗██████╗ ");
+        getLogger().info("██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝████╗  ██║██╔════╝██╔══██╗██╔════╝██║  ██║██║██╔══██╗");
+        getLogger().info("██████╔╝███████║██████╔╝   ██║   ██╔██╗ ██║█████╗  ██████╔╝███████╗███████║██║██████╔╝");
+        getLogger().info("██╔═══╝ ██╔══██║██╔══██╗   ██║   ██║╚██╗██║██╔══╝  ██╔══██╗╚════██║██╔══██║██║██╔═══╝ ");
+        getLogger().info("██║     ██║  ██║██║  ██║   ██║   ██║ ╚████║███████╗██║  ██║███████║██║  ██║██║██║     ");
+        getLogger().info("╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝     ");
+        getLogger().info("              ██████╗ ███████╗██╗    ██╗ █████╗ ██████╗ ██████╗ ███████╗");
+        getLogger().info("              ██╔══██╗██╔════╝██║    ██║██╔══██╗██╔══██╗██╔══██╗██╔════╝");
+        getLogger().info("              ██████╔╝█████╗  ██║ █╗ ██║███████║██████╔╝██║  ██║███████╗");
+        getLogger().info("              ██╔══██╗██╔══╝  ██║███╗██║██╔══██║██╔══██╗██║  ██║╚════██║");
+        getLogger().info("              ██║  ██║███████╗╚███╔███╔╝██║  ██║██║  ██║██████╔╝███████║");
+        getLogger().info("              ╚═╝  ╚═╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝");
+        getLogger().info("");
+        getLogger().info("╔══════════════════════════════════════════════════════════════╗");
+        getLogger().info("║                STATUS: LOADED SUCCESSFULLY                 ║");
+        getLogger().info("╠══════════════════════════════════════════════════════════════╣");
+        getLogger().info(String.format("║ %-58s ║", "Version: v" + getPluginMeta().getVersion()));
+        getLogger().info(String.format("║ %-58s ║", "Developed by: RevelX"));
+        getLogger().info(String.format("║ %-58s ║", "Running on: " + Bukkit.getName() + " " + Bukkit.getVersion()));
+        getLogger().info("╚══════════════════════════════════════════════════════════════╝");
+        getLogger().info("");
     }
     
     @Override
