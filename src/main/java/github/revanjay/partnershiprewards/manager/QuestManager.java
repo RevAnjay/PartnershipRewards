@@ -4,6 +4,7 @@ import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.ActiveQuest;
 import github.revanjay.partnershiprewards.model.Partnership;
 import github.revanjay.partnershiprewards.model.QuestType;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,7 +33,7 @@ public class QuestManager {
     }
     
         private void startBatchSaveTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskTimerAsynchronously(plugin, () -> {
             if (pendingProgressUpdates.isEmpty()) return;
             
             for (Map.Entry<Integer, Integer> entry : pendingProgressUpdates.entrySet()) {
@@ -44,7 +45,7 @@ public class QuestManager {
     }
     
         private void startDailyResetTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskTimerAsynchronously(plugin, () -> {
             long resetHours = plugin.getConfig().getLong("quest.reset-hours", 24);
             long resetSeconds = resetHours * 3600;
             long now = Instant.now().getEpochSecond();
@@ -57,7 +58,7 @@ public class QuestManager {
                 if (now - quest.getCreatedAt() >= resetSeconds) {
                     Partnership partnership = getPartnershipById(entry.getKey());
                     if (partnership != null) {
-                        Bukkit.getScheduler().runTask(plugin, () -> {
+                        SchedulerUtil.runTask(plugin, () -> {
                             resetExpiredQuest(partnership, quest);
                         });
                     } else {
@@ -122,7 +123,7 @@ public class QuestManager {
             ActiveQuest quest = plugin.getDatabaseManager().getActiveQuest(partnership.getId());
             if (quest != null) {
                 if (isQuestExpired(quest)) {
-                    Bukkit.getScheduler().runTask(plugin, () -> resetExpiredQuest(partnership, quest));
+                    SchedulerUtil.runTask(plugin, () -> resetExpiredQuest(partnership, quest));
                 } else {
                     questCache.put(partnership.getId(), quest);
                 }
@@ -130,7 +131,7 @@ public class QuestManager {
         } else {
             ActiveQuest cachedQuest = questCache.get(partnership.getId());
             if (cachedQuest != null && isQuestExpired(cachedQuest)) {
-                Bukkit.getScheduler().runTask(plugin, () -> resetExpiredQuest(partnership, cachedQuest));
+                SchedulerUtil.runTask(plugin, () -> resetExpiredQuest(partnership, cachedQuest));
             }
         }
     }
@@ -272,7 +273,7 @@ public class QuestManager {
             .progress(0)
             .createdAt(Instant.now().getEpochSecond())
             .build();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDatabaseManager().saveActiveQuest(quest));
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> plugin.getDatabaseManager().saveActiveQuest(quest));
         questCache.put(partnership.getId(), quest);
         
         return quest;
@@ -340,7 +341,7 @@ public class QuestManager {
         partnership.setLevel(newLevel);
         final int finalXp = newXp;
         final int finalLevel = newLevel;
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().updatePartnershipXpAndLevel(partnershipId, finalXp, finalLevel);
             plugin.getDatabaseManager().deleteActiveQuest(partnershipId);
         });
@@ -349,7 +350,7 @@ public class QuestManager {
         notifyQuestComplete(partnership, xpReward);
         long now = Instant.now().getEpochSecond();
         partnership.setLastQuestComplete(now);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
+        SchedulerUtil.runTaskAsynchronously(plugin, () ->
             plugin.getDatabaseManager().updateLastQuestComplete(partnershipId, now)
         );
         int cooldownMinutes = plugin.getConfig().getInt("quest.cooldown-minutes", 60);
@@ -401,14 +402,14 @@ public class QuestManager {
         List<String> commands = rewardSection.getStringList("commands");
         String broadcast = rewardSection.getString("broadcast");
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             String player1Name = Bukkit.getOfflinePlayer(partnership.getPlayer1()).getName();
             String player2Name = Bukkit.getOfflinePlayer(partnership.getPlayer2()).getName();
             
             final String name1 = player1Name != null ? player1Name : "Unknown";
             final String name2 = player2Name != null ? player2Name : "Unknown";
             
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            SchedulerUtil.runTask(plugin, () -> {
                 for (String command : commands) {
                     String processed = command
                         .replace("{player}", name1)
@@ -501,7 +502,7 @@ public class QuestManager {
     
         public void deleteActiveQuest(Partnership partnership) {
         questCache.remove(partnership.getId());
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDatabaseManager().deleteActiveQuest(partnership.getId()));
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> plugin.getDatabaseManager().deleteActiveQuest(partnership.getId()));
     }
     
         public void shutdown() {
@@ -527,7 +528,7 @@ public class QuestManager {
         partnership.setLevel(newLevel);
         final int finalXp = newXp;
         final int finalLevel = newLevel;
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().updatePartnershipXpAndLevel(partnership.getId(), finalXp, finalLevel);
         });
     }

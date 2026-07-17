@@ -2,10 +2,10 @@ package github.revanjay.partnershiprewards.manager;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.Partnership;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorize;
 import static github.revanjay.partnershiprewards.PartnershipRewards.colorizeComponent;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class RewardManager {
     
     private final PartnershipRewards plugin;
-    private BukkitTask rewardTask;
+    private SchedulerUtil.TaskHandle rewardTask;
     
     private final List<MilestoneReward> cachedMilestones = new java.util.ArrayList<>();
     private boolean rewardsEnabled = true;
@@ -81,7 +81,7 @@ public class RewardManager {
             rewardTask.cancel();
         }
         
-        rewardTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        rewardTask = SchedulerUtil.runTaskTimerAsynchronously(plugin, () -> {
             checkAndGiveRewards();
         }, 20L * 60, 20L * 60);
     }
@@ -97,7 +97,7 @@ public class RewardManager {
             return;
         }
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             Partnership partnership = plugin.getDatabaseManager().getPartnership(playerUuid);
             if (partnership == null) return;
             
@@ -153,7 +153,7 @@ public class RewardManager {
         final String p1Name = player1Name;
         final String p2Name = player2Name;
         
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        SchedulerUtil.runTask(plugin, () -> {
             for (String command : commands) {
                 String processedCmd = command
                     .replace("{player}", p1Name)
@@ -178,4 +178,3 @@ public class RewardManager {
         });
     }
 }
-

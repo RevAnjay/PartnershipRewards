@@ -2,6 +2,7 @@ package github.revanjay.partnershiprewards.manager;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.Partnership;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -40,7 +41,7 @@ public class StreakManager {
             partnership.setPlayer2LastLogin(today);
         }
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().updatePlayerLogin(partnership.getId(), isPlayer1, today);
             
             
@@ -49,7 +50,7 @@ public class StreakManager {
             if (partnerLastLogin == today) {
                 processStreak(partnership, player, today);
             } else {
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                SchedulerUtil.runTask(plugin, () -> {
                     String msg = plugin.getLanguageManager().getMessage("waiting-partner", true);
                     player.sendMessage(msg);
                     sendActionBar(player, plugin.getLanguageManager().getMessage("waiting-partner-action"));
@@ -81,7 +82,7 @@ public class StreakManager {
         int bonusXp = baseBonusXp * newStreak;
         
         
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        SchedulerUtil.runTask(plugin, () -> {
             plugin.getQuestManager().addBonusXp(partnership, bonusXp);
             
             String streakMsg = plugin.getLanguageManager().getMessage("streak-continue", true)

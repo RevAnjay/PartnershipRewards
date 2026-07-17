@@ -5,6 +5,7 @@ import github.revanjay.partnershiprewards.gui.LevelsGUI;
 import github.revanjay.partnershiprewards.model.ActiveQuest;
 import github.revanjay.partnershiprewards.model.PartnerRequest;
 import github.revanjay.partnershiprewards.model.Partnership;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -305,7 +306,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     }
     
     private void handleTop(Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             List<Partnership> topPartnerships = plugin.getDatabaseManager().getTopPartnerships(10);
             
             if (topPartnerships.isEmpty()) {
@@ -342,7 +343,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             return;
         }
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             List<Partnership> partnerships = plugin.getPartnershipManager().getAllPartnerships();
             
             if (partnerships.isEmpty()) {
@@ -423,7 +424,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         if (args[1].equalsIgnoreCase("pvp")) {
             boolean newState = !partnership.isPvpEnabled();
             partnership.setPvpEnabled(newState);
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            SchedulerUtil.runTaskAsynchronously(plugin, () -> {
                 plugin.getDatabaseManager().updatePvpEnabled(partnership.getId(), newState);
             });
             String statusMsg = newState ? colorize("&a&lENABLED") : colorize("&c&lDISABLED");
@@ -439,7 +440,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         } else if (args[1].equalsIgnoreCase("effects")) {
             boolean newState = !partnership.isEffectsEnabled();
             partnership.setEffectsEnabled(newState);
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            SchedulerUtil.runTaskAsynchronously(plugin, () -> {
                 plugin.getDatabaseManager().updateEffectsEnabled(partnership.getId(), newState);
             });
             String statusMsg = newState ? colorize("&a&lENABLED") : colorize("&c&lDISABLED");
@@ -487,7 +488,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         Location loc = player.getLocation();
         partnership.setHome(loc);
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().updatePartnerHome(partnership.getId(), loc);
         });
         
@@ -546,9 +547,9 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         sendActionBar(player, "&eTeleporting in &f" + warmupSeconds + "s&e...");
         homePending.add(player.getUniqueId());
         
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        SchedulerUtil.runTaskLater(plugin, () -> {
             homePending.remove(player.getUniqueId());
-            
+
             if (!player.isOnline()) return;
             
             Location current = player.getLocation();
@@ -581,7 +582,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         
         partnership.setHomeWorld(null);
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().deletePartnerHome(partnership.getId());
         });
         

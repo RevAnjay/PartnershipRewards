@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 
 @RequiredArgsConstructor
 public class PlayerListener implements Listener {
@@ -18,7 +19,7 @@ public class PlayerListener implements Listener {
         plugin.getPartnershipManager().loadPartnership(event.getPlayer().getUniqueId());
         plugin.getRewardManager().processPlayerJoin(event.getPlayer().getUniqueId());
         
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        SchedulerUtil.runTaskLater(plugin, () -> {
             plugin.getGiftManager().notifyPendingGifts(event.getPlayer());
             plugin.getStreakManager().processLogin(event.getPlayer());
         }, 40L);

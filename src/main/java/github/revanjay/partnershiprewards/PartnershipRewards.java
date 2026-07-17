@@ -94,7 +94,7 @@ public class PartnershipRewards extends JavaPlugin {
         getLogger().info(String.format("║ %-58s ║", "Version: v" + getPluginMeta().getVersion()));
         getLogger().info(String.format("║ %-58s ║", "Developed by: RevelX"));
         getLogger().info(String.format("║ %-58s ║", "Running on: " + Bukkit.getName() + " " + Bukkit.getVersion()));
-        getLogger().info("╚══════════════════════════════════════════════════════════════╝");
+        getLogger().info("╚══════════════════════════════════════════════════════════════╗");
         getLogger().info("");
     }
     
@@ -190,4 +190,3 @@ public class PartnershipRewards extends JavaPlugin {
         this.streakManager = new StreakManager(this);
     }
 }
-

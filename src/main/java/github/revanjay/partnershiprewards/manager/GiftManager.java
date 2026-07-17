@@ -3,6 +3,7 @@ package github.revanjay.partnershiprewards.manager;
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.GiftData;
 import github.revanjay.partnershiprewards.model.Partnership;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -47,10 +48,10 @@ public class GiftManager {
         
         UUID partnerUuid = partnership.getPartner(sender.getUniqueId());
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             int count = plugin.getDatabaseManager().getGiftCount(partnerUuid);
             if (count >= maxPendingGifts) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                SchedulerUtil.runTask(plugin, () -> {
                     sender.sendMessage(colorize("&cPartner already has &e" + maxPendingGifts + " &cpending gifts! Wait until they claim."));
                     playErrorSound(sender);
                 });
@@ -59,7 +60,7 @@ public class GiftManager {
             
             String serialized = serializeItem(item);
             if (serialized == null) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                SchedulerUtil.runTask(plugin, () -> {
                     sender.sendMessage(colorize("&cFailed to send gift! Item cannot be serialized."));
                     playErrorSound(sender);
                 });
@@ -68,7 +69,7 @@ public class GiftManager {
             
             plugin.getDatabaseManager().saveGift(sender.getUniqueId(), partnerUuid, serialized, Instant.now().getEpochSecond());
             
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            SchedulerUtil.runTask(plugin, () -> {
                 sender.getInventory().setItemInMainHand(null);
                 
                 String partnerName = Bukkit.getOfflinePlayer(partnerUuid).getName();
@@ -86,17 +87,17 @@ public class GiftManager {
     }
     
     public void claimGifts(Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             List<GiftData> gifts = plugin.getDatabaseManager().getPendingGifts(player.getUniqueId());
             
             if (gifts.isEmpty()) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                SchedulerUtil.runTask(plugin, () -> {
                     player.sendMessage(plugin.getLanguageManager().getMessage("gift-no-pending", true));
                 });
                 return;
             }
             
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            SchedulerUtil.runTask(plugin, () -> {
                 int claimed = 0;
                 for (GiftData gift : gifts) {
                     ItemStack item = deserializeItem(gift.getItemData());
@@ -127,10 +128,10 @@ public class GiftManager {
     }
     
     public void notifyPendingGifts(Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             int count = plugin.getDatabaseManager().getGiftCount(player.getUniqueId());
             if (count > 0) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                SchedulerUtil.runTask(plugin, () -> {
                     player.sendMessage(colorize("&7You have &e" + count + " &7pending gifts!"));
                     player.sendMessage(colorize("&7Use &e/partner gifts &7to claim."));
                 });

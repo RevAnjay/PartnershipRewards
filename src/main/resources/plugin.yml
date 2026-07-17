@@ -2,6 +2,7 @@ name: PartnershipRewards
 version: 1.2.0
 main: github.revanjay.partnershiprewards.PartnershipRewards
 api-version: '1.20'
+folia-supported: true
 author: RevelX
 description: Partnership system with quest-based leveling, gifts, home, and rewards
 softdepend: [PlaceholderAPI]

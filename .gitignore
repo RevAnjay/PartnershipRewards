@@ -1,7 +1,5 @@
 # Build
 build/
-target/
-out/
 *.class
 
 # IDE
@@ -9,22 +7,9 @@ out/
 *.iml
 .vscode/
 .settings/
-.project
-.classpath
-*.swp
-*~
 
 # Gradle
 .gradle/
-
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Plugin testing
-run/
-server/
 
 # Environment
 .env
@@ -32,6 +17,6 @@ server/
 
 # Agents/Skills (development tools)
 .agents/
-.gemini/
 manifest.kod
-skills-lock.json
+
+bin

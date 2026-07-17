@@ -2,15 +2,15 @@ package github.revanjay.partnershiprewards.manager;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.Partnership;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 public class EffectManager {
-    
+
     private final PartnershipRewards plugin;
-    private BukkitTask effectTask;
+    private SchedulerUtil.TaskHandle effectTask;
     
     public EffectManager(PartnershipRewards plugin) {
         this.plugin = plugin;
@@ -22,7 +22,7 @@ public class EffectManager {
         int interval = plugin.getConfig().getInt("partner-effects.interval-ticks", 60);
         double maxDistance = plugin.getConfig().getDouble("partner-effects.max-distance", 10.0);
         
-        effectTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        effectTask = SchedulerUtil.runTaskTimer(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 processPlayer(player, maxDistance);
             }

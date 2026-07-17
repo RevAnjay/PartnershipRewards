@@ -2,6 +2,7 @@ package github.revanjay.partnershiprewards.manager;
 
 import github.revanjay.partnershiprewards.PartnershipRewards;
 import github.revanjay.partnershiprewards.model.Partnership;
+import github.revanjay.partnershiprewards.util.SchedulerUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 
@@ -15,7 +16,7 @@ public class PartnershipManager {
     private final Map<UUID, Partnership> partnershipCache = new ConcurrentHashMap<>();
     
     public void createPartnership(UUID player1, UUID player2) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             plugin.getDatabaseManager().createPartnership(player1, player2);
             Partnership partnership = plugin.getDatabaseManager().getPartnership(player1);
             if (partnership != null) {
@@ -33,7 +34,7 @@ public class PartnershipManager {
             partnershipCache.remove(partner);
             plugin.getQuestManager().unloadPlayer(player);
             plugin.getQuestManager().unloadPlayer(partner);
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
+            SchedulerUtil.runTaskAsynchronously(plugin, () ->
                 plugin.getDatabaseManager().deletePartnership(player)
             );
         }
@@ -47,7 +48,7 @@ public class PartnershipManager {
         }
         
         
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             Partnership partnership = plugin.getDatabaseManager().getPartnership(player);
             if (partnership != null) {
                 UUID partner = partnership.getPartner(player);
@@ -67,9 +68,9 @@ public class PartnershipManager {
     }
     
         public void hasPartnerDB(UUID player, java.util.function.Consumer<Boolean> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             Partnership partnership = plugin.getDatabaseManager().getPartnership(player);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(partnership != null));
+            SchedulerUtil.runTask(plugin, () -> callback.accept(partnership != null));
         });
     }
     
@@ -79,7 +80,7 @@ public class PartnershipManager {
     }
     
         public void loadPartnership(UUID player) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             Partnership partnership = plugin.getDatabaseManager().getPartnership(player);
             if (partnership == null) return;
             partnershipCache.put(player, partnership);
