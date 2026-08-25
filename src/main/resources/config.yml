@@ -22,7 +22,7 @@ partnership:
   require-both-online: true
   allow-self-partner: false
 
-# Duration-based rewards (legacy system - still works)
+# Duration-based rewards
 rewards:
   enabled: true
   milestones:
@@ -51,9 +51,7 @@ rewards:
         - "give {partner} netherite_ingot 10"
       broadcast: "&#00C6F9{player} &7and &#00C6F9{partner} &7have been partners for &a3 months&7!"
 
-# -------------------------------------------------------
 # Quest System Configuration
-# -------------------------------------------------------
 quest:
   xp-per-quest: 100           # XP reward per completed quest (default)
   base-xp-for-level: 200      # Base XP needed to reach level 2
@@ -75,7 +73,7 @@ quest:
 
   # Quest type definitions
   types:
-    # Light Performance Quests
+    # 🟢 Light Performance Quests
     GIVE_ITEM:
       enabled: true
       items:
@@ -145,7 +143,7 @@ quest:
       enabled: true
       amount: [10, 20, 30]
 
-    # Medium Performance Quests
+    # 🟡 Medium Performance Quests
     KILL_MOBS:
       enabled: true
       max-distance: 30
@@ -219,7 +217,7 @@ quest:
       enabled: true
       amount: [5, 10, 15]
 
-    # Heavy Performance Quests
+    # 🔴 Heavy Performance Quests
     BREAK_BLOCKS:
       enabled: true
       max-distance: 50
@@ -229,7 +227,7 @@ quest:
       enabled: true
       minutes: [30, 60, 120]
 
-    # Boss & Challenging Quests
+    # 🏆 Boss & Challenging Quests
     KILL_BOSS:
       enabled: true
       xp-reward: 500
@@ -319,9 +317,7 @@ quest:
       enabled: true
       amount: [5, 10, 15]
 
-# -------------------------------------------------------
 # Level-Up Rewards
-# -------------------------------------------------------
 level-rewards:
   2:
     commands:
@@ -354,44 +350,36 @@ level-rewards:
       - "give {partner} elytra 1"
     broadcast: "&#00C6F9&lPartnership &7» &#00C6F9{player} &7& &#00C6F9{partner} &7reached &aLevel 25 (Max Tier)&7!"
 
-# -------------------------------------------------------
 # Gift System
-# -------------------------------------------------------
 gift:
   max-pending: 5
 
-# -------------------------------------------------------
 # Partner Effects
-# -------------------------------------------------------
 partner-effects:
   enabled: false
   interval-ticks: 60          # 60 ticks = 3 seconds
   max-distance: 10.0          # Max radius for particles
 
-# -------------------------------------------------------
 # Relationship Status (Progression & Placeholders)
-# -------------------------------------------------------
 relationship:
   levels:
     1:
-      name: "&aBuddy"
+      name: "&a💚 Buddy"
       prefix: "&a[Buddy] "
     5:
-      name: "&9Duo"
+      name: "&9💙 Duo"
       prefix: "&9[Duo] "
     10:
-      name: "&5Bonded"
+      name: "&5💜 Bonded"
       prefix: "&5[Bonded] "
     20:
-      name: "&dPartners"
+      name: "&d💗 Partners"
       prefix: "&d[Partners] "
     30:
-      name: "&6Legends"
+      name: "&6⭐ Legends"
       prefix: "&6[Legends] "
 
-# -------------------------------------------------------
 # Partner Titles (PlaceholderAPI)
-# -------------------------------------------------------
 partner-titles:
   enabled: false
   format: "&d[{title}] "
@@ -403,26 +391,20 @@ partner-titles:
     20: "Duo"
     25: "Legend"
 
-# -------------------------------------------------------
 # Partner Home
-# -------------------------------------------------------
 partner-home:
   enabled: true
   min-level: 3                # Minimum level to set home
   warmup-seconds: 3           # Stand still before teleport
   cooldown-seconds: 60        # Cooldown between teleports
 
-# -------------------------------------------------------
 # Daily Login Streak
-# -------------------------------------------------------
 login-streak:
   enabled: true
   base-bonus-xp: 25           # XP bonus per streak level
   max-streak: 7               # Max streak (7 days = 175 XP)
 
-# -------------------------------------------------------
 # Prestige System
-# -------------------------------------------------------
 prestige:
   enabled: true
   min-partnership-level: 50
@@ -430,8 +412,6 @@ prestige:
   xp-bonus-per-prestige: 5.0  # Percentage XP boost per prestige level
   max-prestige: -1            # -1 = unlimited
 
-# -------------------------------------------------------
 # Anniversary Celebration
-# -------------------------------------------------------
 anniversary:
   enabled: true
