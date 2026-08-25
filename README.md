@@ -5,7 +5,7 @@
 [![Build](https://img.shields.io/badge/Build-Gradle-blue.svg)](https://gradle.org/)
 [![Paper](https://img.shields.io/badge/Paper-1.20.x-blue.svg)](https://papermc.io/)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
-[![Version](https://img.shields.io/badge/Version-1.2.0-green.svg)](#)
+[![Version](https://img.shields.io/badge/Version-1.3.0-green.svg)](#)
 
 **A partnership system for Minecraft featuring quest-based leveling, gifts, shared homes, and rewards.**
 
