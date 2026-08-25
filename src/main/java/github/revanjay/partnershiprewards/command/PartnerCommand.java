@@ -177,20 +177,19 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         PartnerRequest request = plugin.getRequestManager().getRequest(player.getUniqueId());
         
         if (request == null) {
-            player.sendMessage(colorize("&cYou don't have any pending partnership requests!"));
+            player.sendMessage(getMsg("request-no-pending"));
             playErrorSound(player);
             return;
         }
         
         plugin.getRequestManager().removeRequest(player.getUniqueId());
-        player.sendMessage(colorize("&aYou rejected the partnership request!"));
+        player.sendMessage(getMsg("request-rejected-self"));
         
         Player sender = Bukkit.getPlayer(request.getSender());
         if (sender != null) {
-            sender.sendMessage(colorize("&c" + player.getName() + " rejected your partnership request!"));
+            sender.sendMessage(getMsg("request-rejected-target").replace("{player}", player.getName()));
         }
     }
-    
     private void handleBreak(Player player) {
         if (!plugin.getPartnershipManager().hasPartner(player.getUniqueId())) {
             player.sendMessage(getMsg("no-partner"));
@@ -228,23 +227,25 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         String startDate = sdf.format(new Date(partnership.getStartedAt() * 1000));
-        player.sendMessage(colorize("&d&l=== &ePartnership Info &d&l==="));
-        player.sendMessage(colorize("&7Partner: &e" + partnerName));
-        player.sendMessage(colorize("&7Duration: &a" + duration));
-        player.sendMessage(colorize("&7Started: &a" + startDate));
         int level = partnership.getLevel();
         int xp = partnership.getXp();
         int requiredXp = plugin.getQuestManager().getRequiredXpForLevel(level + 1);
         int xpPercentage = requiredXp > 0 ? (xp * 100) / requiredXp : 100;
         
-        player.sendMessage(colorize("&7Level: &b" + level + " &7| XP: &b" + xp + "/" + requiredXp + " &7(" + xpPercentage + "%)"));
         ActiveQuest quest = plugin.getQuestManager().getActiveQuest(player.getUniqueId());
-        if (quest != null) {
-            player.sendMessage(colorize("&7Quest: &e" + quest.getFormattedDescription()));
-            player.sendMessage(colorize("&7Progress: ") + quest.getProgressBar() + colorize(" &7(" + quest.getProgress() + "/" + quest.getRequiredAmount() + ")"));
-        } else {
-            player.sendMessage(colorize("&7Quest: &cNo active quest"));
-        }
+        String questDesc = quest != null ? quest.getFormattedDescription() : plugin.getLanguageManager().getMessage("quest-none");
+
+        String infoMsg = plugin.getLanguageManager().getMessage("partnership-info")
+                .replace("{player}", partnerName)
+                .replace("{duration}", duration)
+                .replace("{start_date}", startDate)
+                .replace("{level}", String.valueOf(level))
+                .replace("{xp}", String.valueOf(xp))
+                .replace("{required}", String.valueOf(requiredXp))
+                .replace("{percent}", String.valueOf(xpPercentage))
+                .replace("{quest}", questDesc);
+
+        player.sendMessage(infoMsg);
     }
     
     private void handleQuest(Player player) {
@@ -261,25 +262,27 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         if (quest == null) {
             if (plugin.getQuestManager().isOnQuestCooldown(partnership)) {
                 long remaining = plugin.getQuestManager().getQuestCooldownRemaining(partnership);
-                player.sendMessage(colorize("&cCooldown active! &7New quest in &e" + remaining + " minutes&7."));
+                player.sendMessage(getMsg("quest-new-in").replace("{mins}", String.valueOf(remaining)));
                 playErrorSound(player);
-                player.sendMessage(colorize("&7Use &e/partner level &7to view full status."));
                 return;
             }
             quest = plugin.getQuestManager().generateRandomQuest(partnership);
             if (quest == null) {
-                player.sendMessage(colorize("&cFailed to generate quest! Check config."));
+                player.sendMessage(getMsg("quest-failed"));
                 playErrorSound(player);
                 return;
             }
-            player.sendMessage(colorize("&aNew quest generated!"));
         }
         
-        player.sendMessage(colorize("&d&l=== &eActive Quest &d&l==="));
-        player.sendMessage(colorize("&7Type: &e" + quest.getQuestType().getDisplayName()));
-        player.sendMessage(colorize("&7Description: &f" + quest.getFormattedDescription()));
-        player.sendMessage(colorize("&7Progress: ") + quest.getProgressBar() + colorize(" &e" + quest.getProgress() + "&7/&e" + quest.getRequiredAmount()));
-        player.sendMessage(colorize("&7Completion: &a" + quest.getCompletionPercentage() + "%"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-header"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-type").replace("{type}", quest.getQuestType().getDisplayName()));
+        player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-desc").replace("{desc}", quest.getFormattedDescription()));
+        player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-progress")
+                .replace("{bar}", quest.getProgressBar())
+                .replace("{current}", String.valueOf(quest.getProgress()))
+                .replace("{required}", String.valueOf(quest.getRequiredAmount())));
+        player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-completion").replace("{percent}", String.valueOf(quest.getCompletionPercentage())));
+        
         long resetHours = plugin.getConfig().getLong("quest.reset-hours", 24);
         long resetSeconds = resetHours * 3600;
         long now = java.time.Instant.now().getEpochSecond();
@@ -289,13 +292,15 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         if (remaining > 0) {
             long hoursRemaining = remaining / 3600;
             long minutesRemaining = (remaining % 3600) / 60;
-            player.sendMessage(colorize("&7Time Left: &c" + hoursRemaining + "h " + minutesRemaining + "m"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-time-left")
+                    .replace("{hours}", String.valueOf(hoursRemaining))
+                    .replace("{mins}", String.valueOf(minutesRemaining)));
         } else {
-            player.sendMessage(colorize("&7Time Left: &cExpired!"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-expired"));
         }
         
         int xpReward = plugin.getConfig().getInt("quest.xp-per-quest", 100);
-        player.sendMessage(colorize("&7Reward: &b+" + xpReward + " XP"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("quest-info-reward").replace("{xp}", String.valueOf(xpReward)));
     }
     
     private void handleLevelGUI(Player player) {
@@ -414,7 +419,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     
     private void handleToggle(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(colorize("&cUsage: &e/partner toggle <pvp|effects>"));
+            player.sendMessage(getMsg("cmd-usage-toggle"));
             playErrorSound(player);
             return;
         }
@@ -432,15 +437,14 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             SchedulerUtil.runTaskAsynchronously(plugin, () -> {
                 plugin.getDatabaseManager().updatePvpEnabled(partnership.getId(), newState);
             });
-            String statusMsg = newState ? colorize("&a&lENABLED") : colorize("&c&lDISABLED");
-            String message = colorize("&7PvP with partner is now ") + statusMsg + colorize("&7!");
-            
+            String msgKey = newState ? "pvp-enabled" : "pvp-disabled";
+            String message = getMsg(msgKey);
             player.sendMessage(message);
-            sendActionBar(player, "&7PvP: " + (newState ? "&aON" : "&cOFF"));
+            sendActionBar(player, newState ? "&7PvP: &aON" : "&7PvP: &cOFF");
             Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
             if (partner != null) {
                 partner.sendMessage(message);
-                sendActionBar(partner, "&7PvP: " + (newState ? "&aON" : "&cOFF"));
+                sendActionBar(partner, newState ? "&7PvP: &aON" : "&7PvP: &cOFF");
             }
         } else if (args[1].equalsIgnoreCase("effects")) {
             boolean newState = !partnership.isEffectsEnabled();
@@ -448,20 +452,18 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             SchedulerUtil.runTaskAsynchronously(plugin, () -> {
                 plugin.getDatabaseManager().updateEffectsEnabled(partnership.getId(), newState);
             });
-            String statusMsg = newState ? colorize("&a&lENABLED") : colorize("&c&lDISABLED");
-            String message = colorize("&7Partner effects are now ") + statusMsg + colorize("&7!");
-            
+            String msgKey = newState ? "effects-enabled" : "effects-disabled";
+            String message = getMsg(msgKey);
             player.sendMessage(message);
-            sendActionBar(player, "&7Effects: " + (newState ? "&aON" : "&cOFF"));
+            sendActionBar(player, newState ? "&7Effects: &aON" : "&7Effects: &cOFF");
             Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
             if (partner != null) {
                 partner.sendMessage(message);
-                sendActionBar(partner, "&7Effects: " + (newState ? "&aON" : "&cOFF"));
+                sendActionBar(partner, newState ? "&7Effects: &aON" : "&7Effects: &cOFF");
             }
         } else {
-            player.sendMessage(colorize("&cUnknown toggle option: &e" + args[1]));
+            player.sendMessage(getMsg("cmd-usage-toggle"));
             playErrorSound(player);
-            player.sendMessage(colorize("&7Available: &epvp, effects"));
         }
     }
     
@@ -485,7 +487,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         
         int minLevel = plugin.getConfig().getInt("partner-home.min-level", 3);
         if (partnership.getLevel() < minLevel) {
-            player.sendMessage(colorize("&cPartnership must be level &e" + minLevel + " &cto set home!"));
+            player.sendMessage(getMsg("home-min-level").replace("{level}", String.valueOf(minLevel)));
             playErrorSound(player);
             return;
         }
@@ -497,12 +499,11 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             plugin.getDatabaseManager().updatePartnerHome(partnership.getId(), loc);
         });
         
-        player.sendMessage(colorize("&aPartner home set successfully!"));
-        player.sendMessage(colorize("&7Location: &e" + loc.getWorld().getName() + " &7(" + (int) loc.getX() + ", " + (int) loc.getY() + ", " + (int) loc.getZ() + ")"));
+        player.sendMessage(getMsg("home-set-success"));
         
         Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
         if (partner != null) {
-            partner.sendMessage(colorize("&e" + player.getName() + " &7has changed the partner home!"));
+            partner.sendMessage(getMsg("home-changed-notify").replace("{player}", player.getName()));
         }
     }
     
@@ -515,14 +516,14 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         }
         
         if (!partnership.hasHome()) {
-            player.sendMessage(colorize("&cPartner home is not set! Use &e/partner sethome"));
+            player.sendMessage(getMsg("home-no-home"));
             playErrorSound(player);
             return;
         }
         
         Location homeLoc = partnership.getHomeLocation();
         if (homeLoc == null) {
-            player.sendMessage(colorize("&cPartner home world not found!"));
+            player.sendMessage(getMsg("home-world-not-found"));
             playErrorSound(player);
             return;
         }
@@ -533,14 +534,14 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             long elapsed = (System.currentTimeMillis() - lastUse) / 1000;
             if (elapsed < cooldownSeconds) {
                 long remaining = cooldownSeconds - elapsed;
-                player.sendMessage(colorize("&cWait &e" + remaining + " seconds &cmore!"));
+                player.sendMessage(getMsg("home-cooldown").replace("{seconds}", String.valueOf(remaining)));
                 playErrorSound(player);
                 return;
             }
         }
         
         if (homePending.contains(player.getUniqueId())) {
-            player.sendMessage(colorize("&cYou are already teleporting!"));
+            player.sendMessage(getMsg("home-already-teleporting"));
             playErrorSound(player);
             return;
         }
@@ -548,7 +549,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         int warmupSeconds = plugin.getConfig().getInt("partner-home.warmup-seconds", 3);
         Location startLoc = player.getLocation().clone();
         
-        player.sendMessage(colorize("&eTeleporting in &f" + warmupSeconds + " seconds&e... Don't move!"));
+        player.sendMessage(getMsg("home-teleporting").replace("{seconds}", String.valueOf(warmupSeconds)));
         sendActionBar(player, "&eTeleporting in &f" + warmupSeconds + "s&e...");
         homePending.add(player.getUniqueId());
         
@@ -583,7 +584,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         }
         
         if (!partnership.hasHome()) {
-            player.sendMessage(colorize("&cPartner home is not set!"));
+            player.sendMessage(getMsg("home-no-home"));
             playErrorSound(player);
             return;
         }
@@ -594,32 +595,32 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             plugin.getDatabaseManager().deletePartnerHome(partnership.getId());
         });
         
-        player.sendMessage(colorize("&aPartner home deleted!"));
+        player.sendMessage(getMsg("home-del-success"));
     }
     
     private void sendHelp(Player player) {
-        player.sendMessage(colorize("&d&l=== &ePartner Commands &d&l==="));
-        player.sendMessage(colorize("&e/partner request <player> &7- Send a partnership request"));
-        player.sendMessage(colorize("&e/partner accept &7- Accept a partnership request"));
-        player.sendMessage(colorize("&e/partner reject &7- Reject a partnership request"));
-        player.sendMessage(colorize("&e/partner break &7- Break the partnership"));
-        player.sendMessage(colorize("&e/partner info &7- View partnership info"));
-        player.sendMessage(colorize("&e/partner quest &7- View active quest"));
-        player.sendMessage(colorize("&e/partner level &7- Open level progress GUI"));
-        player.sendMessage(colorize("&e/partner chat [message] &7- Toggle/send message to partner"));
-        player.sendMessage(colorize("&e/partner gift &7- Send an item to your partner"));
-        player.sendMessage(colorize("&e/partner gifts &7- Claim gifts from your partner"));
-        player.sendMessage(colorize("&e/partner sethome &7- Set partner home"));
-        player.sendMessage(colorize("&e/partner home &7- Teleport to partner home"));
-        player.sendMessage(colorize("&e/partner delhome &7- Delete partner home"));
-        player.sendMessage(colorize("&e/partner toggle <pvp|effects> &7- Toggle features"));
-        player.sendMessage(colorize("&e/partner top/leaderboard &7- View partnership leaderboards"));
-        player.sendMessage(colorize("&e/partner stats &7- View detailed analytics & stats"));
-        player.sendMessage(colorize("&e/partner propose [player] &7- Propose marriage to your partner"));
-        player.sendMessage(colorize("&e/partner prestige &7- Ascend to the next Prestige rank"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-header"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "request <player>").replace("{desc}", "Send partnership request"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "accept [player]").replace("{desc}", "Accept partnership request"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "reject").replace("{desc}", "Reject partnership request"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "break").replace("{desc}", "Break current partnership"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "info").replace("{desc}", "View partnership info"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "quest").replace("{desc}", "View active quest"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "level").replace("{desc}", "Open level progress GUI"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "chat [msg]").replace("{desc}", "Toggle/send partner chat"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "gift").replace("{desc}", "Send held item to partner"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "gifts").replace("{desc}", "Claim pending gifts"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "sethome").replace("{desc}", "Set partner home"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "home").replace("{desc}", "Teleport to partner home"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "delhome").replace("{desc}", "Delete partner home"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "toggle <pvp|effects>").replace("{desc}", "Toggle features"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "top / leaderboard").replace("{desc}", "View leaderboards"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "stats").replace("{desc}", "View detailed stats"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "propose").replace("{desc}", "Propose to partner"));
+        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "prestige").replace("{desc}", "Ascend to next Prestige"));
         
         if (player.hasPermission("partnershiprewards.admin")) {
-            player.sendMessage(colorize("&e/partner list &7- View all partnerships"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "list").replace("{desc}", "View all partnerships"));
         }
     }
 
@@ -630,7 +631,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     private void handleStats(Player player) {
         Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
         if (partnership == null) {
-            player.sendMessage(getMsg("not-partnered"));
+            player.sendMessage(getMsg("no-partner"));
             playErrorSound(player);
             return;
         }
@@ -640,7 +641,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     private void handlePropose(Player player, String[] args) {
         Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
         if (partnership == null) {
-            player.sendMessage(getMsg("not-partnered"));
+            player.sendMessage(getMsg("no-partner"));
             playErrorSound(player);
             return;
         }
@@ -649,21 +650,21 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         Long lastProposal = proposalCooldown.get(player.getUniqueId());
         if (lastProposal != null && now - lastProposal < 60000L) {
             long remainingSec = (60000L - (now - lastProposal)) / 1000L;
-            player.sendMessage(colorize("&cPlease wait &e" + remainingSec + "s &cbefore proposing again!"));
+            player.sendMessage(getMsg("proposal-cooldown").replace("{seconds}", String.valueOf(remainingSec)));
             playErrorSound(player);
             return;
         }
 
         Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
         if (partner == null || !partner.isOnline()) {
-            player.sendMessage(colorize("&cYour partner must be online to propose!"));
+            player.sendMessage(getMsg("proposal-partner-offline"));
             playErrorSound(player);
             return;
         }
 
         proposalCooldown.put(player.getUniqueId(), now);
         new github.revanjay.partnershiprewards.gui.ProposalGUI(plugin, player, partner).open();
-        player.sendMessage(colorize("&dProposal sent to &f" + partner.getName() + "&d! Waiting for their answer..."));
+        player.sendMessage(getMsg("proposal-sent").replace("{player}", partner.getName()));
     }
     private void handlePrestige(Player player) {
         if (plugin.getPrestigeManager() != null) {

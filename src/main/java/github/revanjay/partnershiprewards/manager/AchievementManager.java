@@ -188,7 +188,7 @@ public class AchievementManager {
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
 
-        String msg = "&6&l[ACHIEVEMENT UNLOCKED]&r &e" + achievement.getTitle() + " &7- " + achievement.getDescription();
+        String msg = "&#00C6F9&l[ACHIEVEMENT]&r &aUnlocked: &f" + achievement.getTitle() + " &7- &e" + achievement.getDescription() + " &7(Title: &#00C6F9" + achievement.getRewardTitle() + "&7)";
         if (p1 != null && p1.isOnline()) {
             p1.sendMessage(PartnershipRewards.colorize(msg));
             PartnershipRewards.playLevelUpSound(p1);

@@ -63,9 +63,8 @@ public class AnniversaryManager {
 
         Player p1 = Bukkit.getPlayer(partnership.getPlayer1());
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
-
-        String broadcastMsg = "&d&l[ANNIVERSARY]&r &f" + (p1 != null ? p1.getName() : "Partner 1") + " &7& &f" +
-                (p2 != null ? p2.getName() : "Partner 2") + " &eare celebrating their &d" + title;
+        String broadcastMsg = "&#00C6F9&l[ANNIVERSARY]&r &#00C6F9" + (p1 != null ? p1.getName() : "Partner 1") + " &7& &#00C6F9" +
+                (p2 != null ? p2.getName() : "Partner 2") + " &7are celebrating their &#00C6F9" + title + "&7!";
 
         Bukkit.broadcast(PartnershipRewards.colorizeComponent(broadcastMsg));
 

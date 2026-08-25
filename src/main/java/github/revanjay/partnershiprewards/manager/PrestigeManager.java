@@ -26,14 +26,16 @@ public class PrestigeManager {
     public boolean performPrestige(Player player) {
         Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
         if (partnership == null) {
-            player.sendMessage(PartnershipRewards.colorize("&cYou are not in a partnership!"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("prestige-not-in-partnership", true));
             return false;
         }
 
+        int minLevel = plugin.getConfig().getInt("prestige.min-partnership-level", 50);
         if (!canPrestige(partnership)) {
-            int minLevel = plugin.getConfig().getInt("prestige.min-partnership-level", 50);
             int minDays = plugin.getConfig().getInt("prestige.min-days-active", 30);
-            player.sendMessage(PartnershipRewards.colorize("&cYou need Level " + minLevel + " and " + minDays + " days active to prestige!"));
+            player.sendMessage(plugin.getLanguageManager().getMessage("prestige-requirements", true)
+                    .replace("{level}", String.valueOf(minLevel))
+                    .replace("{days}", String.valueOf(minDays)));
             return false;
         }
 
@@ -52,11 +54,13 @@ public class PrestigeManager {
         Player p2 = Bukkit.getPlayer(partnership.getPlayer2());
 
         String badge = getPrestigeBadge(newPrestige);
-        String broadcast = "&6&l[PRESTIGE]&r &f" + (p1 != null ? p1.getName() : "Partner 1") + " &7& &f" +
-                (p2 != null ? p2.getName() : "Partner 2") + " &eascended to &6&lPrestige " + newPrestige + " " + badge + "! 🎉";
+        String broadcast = plugin.getLanguageManager().getMessage("prestige-broadcast")
+                .replace("{player1}", p1 != null ? p1.getName() : "Partner 1")
+                .replace("{player2}", p2 != null ? p2.getName() : "Partner 2")
+                .replace("{level}", String.valueOf(newPrestige))
+                .replace("{badge}", badge);
 
         Bukkit.broadcast(PartnershipRewards.colorizeComponent(broadcast));
-
         if (p1 != null && p1.isOnline()) {
             PartnershipRewards.playLevelUpSound(p1);
             p1.playSound(p1.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
