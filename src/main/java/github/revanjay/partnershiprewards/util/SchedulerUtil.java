@@ -27,6 +27,27 @@ public final class SchedulerUtil {
     public static boolean isFolia() {
         return FOLIA;
     }
+    // --- Entity / Player Schedulers (Folia region-safe) ---
+
+    public static void runForEntity(JavaPlugin plugin, org.bukkit.entity.Entity entity, Runnable task) {
+        if (FOLIA) {
+            entity.getScheduler().run(plugin, t -> task.run(), null);
+        } else {
+            Bukkit.getScheduler().runTask(plugin, task);
+        }
+    }
+
+    public static void runForEntityLater(JavaPlugin plugin, org.bukkit.entity.Entity entity, Runnable task, long delayTicks) {
+        if (FOLIA) {
+            entity.getScheduler().runDelayed(plugin, t -> task.run(), null, delayTicks);
+        } else {
+            Bukkit.getScheduler().runTaskLater(plugin, task, delayTicks);
+        }
+    }
+
+    public static java.util.concurrent.CompletableFuture<Boolean> teleportAsync(org.bukkit.entity.Player player, org.bukkit.Location location) {
+        return player.teleportAsync(location);
+    }
 
     // --- Sync (global region) ---
 

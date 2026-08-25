@@ -552,7 +552,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         sendActionBar(player, "&eTeleporting in &f" + warmupSeconds + "s&e...");
         homePending.add(player.getUniqueId());
         
-        SchedulerUtil.runTaskLater(plugin, () -> {
+        SchedulerUtil.runForEntityLater(plugin, player, () -> {
             homePending.remove(player.getUniqueId());
 
             if (!player.isOnline()) return;
@@ -565,9 +565,12 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
                 return;
             }
             
-            player.teleport(homeLoc);
-            homeCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-            sendActionBar(player, "&aTeleported to partner home!");
+            SchedulerUtil.teleportAsync(player, homeLoc).thenAccept(success -> {
+                if (Boolean.TRUE.equals(success)) {
+                    homeCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+                    sendActionBar(player, "&aTeleported to partner home!");
+                }
+            });
         }, 20L * warmupSeconds);
     }
     
