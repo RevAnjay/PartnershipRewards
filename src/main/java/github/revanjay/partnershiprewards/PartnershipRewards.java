@@ -30,7 +30,12 @@ public class PartnershipRewards extends JavaPlugin {
     private GiftManager giftManager;
     private ChatManager chatManager;
     private EffectManager effectManager;
+    private ParticleEffectManager particleEffectManager;
     private StreakManager streakManager;
+    private AchievementManager achievementManager;
+    private AnniversaryManager anniversaryManager;
+    private PrestigeManager prestigeManager;
+    private github.revanjay.partnershiprewards.task.ValentinesTask valentinesTask;
     
     private PartnerListener partnerListener;
     private PlayTogetherTask playTogetherTask;
@@ -57,6 +62,21 @@ public class PartnershipRewards extends JavaPlugin {
     
     public static void playErrorSound(Player player) {
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+    }
+
+    public static void playQuestCompleteSound(Player player) {
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
+    }
+
+    public static void playLevelUpSound(Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+    }
+    public static void playPartnerHappySound(Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.8f, 1.5f);
+    }
+
+    public static void playButtonClickSound(Player player) {
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.8f, 1.0f);
     }
     
     @Override
@@ -131,10 +151,15 @@ public class PartnershipRewards extends JavaPlugin {
         this.partnershipManager = new PartnershipManager(this);
         this.requestManager = new RequestManager(this);
         this.rewardManager = new RewardManager(this);
+        this.achievementManager = new AchievementManager(this);
+        this.achievementManager.initialize();
+        this.anniversaryManager = new AnniversaryManager(this);
+        this.prestigeManager = new PrestigeManager(this);
         this.questManager = new QuestManager(this);
         this.giftManager = new GiftManager(this);
         this.chatManager = new ChatManager(this);
         this.effectManager = new EffectManager(this);
+        this.particleEffectManager = new ParticleEffectManager(this);
         this.streakManager = new StreakManager(this);
         
         this.rewardManager.startRewardTask();
@@ -156,6 +181,10 @@ public class PartnershipRewards extends JavaPlugin {
         this.playTogetherTask = new PlayTogetherTask(this);
         this.playTogetherTask.start();
         this.effectManager.start();
+        this.particleEffectManager.start();
+        this.anniversaryManager.start();
+        this.valentinesTask = new github.revanjay.partnershiprewards.task.ValentinesTask(this);
+        this.valentinesTask.start();
     }
     
     private void registerHooks() {
@@ -164,7 +193,6 @@ public class PartnershipRewards extends JavaPlugin {
             getLogger().info("PlaceholderAPI hook registered! Use %partner_<placeholder>%");
         }
     }
-    
     public void reload() {
         reloadConfig();
         

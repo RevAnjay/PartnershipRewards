@@ -129,10 +129,17 @@ public class DatabaseManager {
             addColumnIfNotExists(conn, "partnerships", "last_streak_date", "BIGINT DEFAULT 0");
             addColumnIfNotExists(conn, "partnerships", "player1_last_login", "BIGINT DEFAULT 0");
             addColumnIfNotExists(conn, "partnerships", "player2_last_login", "BIGINT DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "engagement_date", "BIGINT DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "prestige_level", "INTEGER DEFAULT 0");
+            addColumnIfNotExists(conn, "partnerships", "total_prestige_points", "INTEGER DEFAULT 0");
         } catch (SQLException e) {
             plugin.getLogger().severe("Error creating tables: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
     
     private void addColumnIfNotExists(Connection conn, String table, String column, String definition) {
@@ -441,9 +448,11 @@ public class DatabaseManager {
             .lastStreakDate(rs.getLong("last_streak_date"))
             .player1LastLogin(rs.getLong("player1_last_login"))
             .player2LastLogin(rs.getLong("player2_last_login"))
+            .engagementDate(rs.getLong("engagement_date"))
+            .prestigeLevel(rs.getInt("prestige_level"))
+            .totalPrestigePoints(rs.getInt("total_prestige_points"))
             .build();
     }
-    
     
     public void updateEffectsEnabled(int partnershipId, boolean enabled) {
         String sql = "UPDATE partnerships SET effects_enabled = ? WHERE id = ?";
@@ -585,6 +594,30 @@ public class DatabaseManager {
         }
     }
     
+    public void updateEngagementDate(int partnershipId, long engagementDate) {
+        String sql = "UPDATE partnerships SET engagement_date = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, engagementDate);
+            stmt.setInt(2, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error updating engagement date: " + e.getMessage());
+        }
+    }
+
+    public void updatePrestige(int partnershipId, int prestigeLevel, int totalPrestigePoints) {
+        String sql = "UPDATE partnerships SET prestige_level = ?, total_prestige_points = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, prestigeLevel);
+            stmt.setInt(2, totalPrestigePoints);
+            stmt.setInt(3, partnershipId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Error updating prestige: " + e.getMessage());
+        }
+    }
     public void close() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();

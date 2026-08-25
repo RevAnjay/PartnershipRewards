@@ -55,7 +55,12 @@ public class Partnership {
     private long player1LastLogin = 0;
     @Builder.Default
     private long player2LastLogin = 0;
-    
+    @Builder.Default
+    private long engagementDate = 0;
+    @Builder.Default
+    private int prestigeLevel = 0;
+    @Builder.Default
+    private int totalPrestigePoints = 0;
     public UUID getPartner(UUID player) {
         return player.equals(player1) ? player2 : player1;
     }

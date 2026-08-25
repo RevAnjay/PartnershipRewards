@@ -348,6 +348,18 @@ public class QuestManager {
         questCache.remove(partnershipId);
         pendingProgressUpdates.remove(quest.getId());
         notifyQuestComplete(partnership, xpReward);
+        Player player1 = Bukkit.getPlayer(partnership.getPlayer1());
+        Player player2 = Bukkit.getPlayer(partnership.getPlayer2());
+        if (player1 != null) PartnershipRewards.playQuestCompleteSound(player1);
+        if (player2 != null) PartnershipRewards.playQuestCompleteSound(player2);
+        
+        if (plugin.getAchievementManager() != null) {
+            plugin.getAchievementManager().checkAndProgress(partnership, "FIRST_QUEST", 1);
+            plugin.getAchievementManager().checkAndProgress(partnership, "QUEST_10", 1);
+            plugin.getAchievementManager().checkAndProgress(partnership, "QUEST_100", 1);
+            if (newLevel >= 10) plugin.getAchievementManager().checkAndProgress(partnership, "LEVEL_10", 1);
+            if (newLevel >= 50) plugin.getAchievementManager().checkAndProgress(partnership, "LEVEL_50", 1);
+        }
         long now = Instant.now().getEpochSecond();
         partnership.setLastQuestComplete(now);
         SchedulerUtil.runTaskAsynchronously(plugin, () ->
@@ -357,7 +369,7 @@ public class QuestManager {
         notifyCooldownStart(partnership, cooldownMinutes);
     }
     
-        private Partnership getPartnershipById(int partnershipId) {
+    private Partnership getPartnershipById(int partnershipId) {
         for (Map.Entry<UUID, Integer> entry : playerPartnershipCache.entrySet()) {
             if (entry.getValue() == partnershipId) {
                 return plugin.getPartnershipManager().getPartnership(entry.getKey());

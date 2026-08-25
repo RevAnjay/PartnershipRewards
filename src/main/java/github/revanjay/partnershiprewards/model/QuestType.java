@@ -39,8 +39,17 @@ public enum QuestType {
     MINE_DIAMOND_ORE("Mine Diamond Ore", "Mine {amount} diamond ore", "BlockBreakEvent"),
     MINE_DEEPSLATE_ORES("Mine Deepslate Ore", "Mine {amount} deepslate ore", "BlockBreakEvent"),
     KILL_WITHER_SKELETONS("Kill Wither Skeletons", "Kill {amount} wither skeletons with your partner", "EntityDeathEvent"),
-    SMELT_NETHERITE("Smelt Netherite", "Smelt {amount} netherite scrap in a furnace", "FurnaceExtractEvent");
-    
+    SMELT_NETHERITE("Smelt Netherite", "Smelt {amount} netherite scrap in a furnace", "FurnaceExtractEvent"),
+    HUG_PARTNER("Hug Partner", "Stand close to your partner {amount} times", "Proximity"),
+    DANCE_TOGETHER("Dance Together", "Sneak/dance together {amount} times", "PlayerToggleSneakEvent"),
+    BUILD_TOGETHER("Build Together", "Place {amount} blocks near your partner", "BlockPlaceEvent"),
+    EXPLORE_TOGETHER("Explore Together", "Move {amount} blocks together", "PlayerMoveEvent"),
+    FARM_CROP_COMBINED("Farm Crops Combined", "Harvest {amount} crops combined with your partner", "BlockBreakEvent"),
+    KILL_BOSS_TOGETHER("Kill Boss Together", "Defeat {amount} bosses together", "EntityDeathEvent"),
+    GIVE_RANDOM_GIFT("Give Random Gift", "Send {amount} gifts to your partner", "GiftEvent"),
+    TELL_SECRET_CHAT("Secret Chat", "Send {amount} partner chat messages", "AsyncChatEvent"),
+    SHARE_FOOD("Share Food", "Consume {amount} food items near your partner", "PlayerItemConsumeEvent"),
+    PROPOSE_MARRIAGE("Propose Marriage", "Propose to your partner with a ring", "ProposalEvent");
     private final String displayName;
     private final String descriptionTemplate;
     private final String eventType;
@@ -69,17 +78,21 @@ public enum QuestType {
             .replace("{amount}", String.valueOf(amount));
     }
     
-        public boolean isHeavy() {
-        return this == BREAK_BLOCKS || this == PLAY_TOGETHER || this == MINE_ANCIENT_DEBRIS;
+    public boolean isHeavy() {
+        return this == BREAK_BLOCKS || this == PLAY_TOGETHER || this == MINE_ANCIENT_DEBRIS || this == EXPLORE_TOGETHER;
     }
     
-        public boolean requiresProximity() {
+    public boolean requiresProximity() {
         return this == KILL_MOBS || this == BREAK_BLOCKS || this == SLEEP_TOGETHER 
-            || this == KILL_BOSS || this == MINE_ANCIENT_DEBRIS || this == COMPLETE_RAID;
+            || this == KILL_BOSS || this == MINE_ANCIENT_DEBRIS || this == COMPLETE_RAID
+            || this == HUG_PARTNER || this == DANCE_TOGETHER || this == BUILD_TOGETHER
+            || this == EXPLORE_TOGETHER || this == FARM_CROP_COMBINED || this == KILL_BOSS_TOGETHER
+            || this == SHARE_FOOD || this == PROPOSE_MARRIAGE;
     }
     
-        public boolean isBonusQuest() {
-        return this == KILL_BOSS || this == MINE_ANCIENT_DEBRIS || this == COMPLETE_RAID;
+    public boolean isBonusQuest() {
+        return this == KILL_BOSS || this == MINE_ANCIENT_DEBRIS || this == COMPLETE_RAID
+            || this == KILL_BOSS_TOGETHER || this == PROPOSE_MARRIAGE;
     }
 }
 

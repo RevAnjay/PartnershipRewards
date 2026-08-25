@@ -58,7 +58,10 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             case "info" -> handleInfo(player);
             case "quest" -> handleQuest(player);
             case "level", "gui" -> handleLevelGUI(player);
-            case "top" -> handleTop(player);
+            case "top", "leaderboard" -> handleLeaderboard(player);
+            case "stats", "queststats" -> handleStats(player);
+            case "propose" -> handlePropose(player, args);
+            case "prestige", "prestige-reset" -> handlePrestige(player);
             case "list" -> handleList(player);
             case "chat" -> handleChat(player, args);
             case "toggle" -> handleToggle(player, args);
@@ -605,10 +608,52 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(colorize("&e/partner home &7- Teleport to partner home"));
         player.sendMessage(colorize("&e/partner delhome &7- Delete partner home"));
         player.sendMessage(colorize("&e/partner toggle <pvp|effects> &7- Toggle features"));
-        player.sendMessage(colorize("&e/partner top &7- View top 10 partnerships"));
+        player.sendMessage(colorize("&e/partner top/leaderboard &7- View partnership leaderboards"));
+        player.sendMessage(colorize("&e/partner stats &7- View detailed analytics & stats"));
+        player.sendMessage(colorize("&e/partner propose [player] &7- Propose marriage to your partner"));
+        player.sendMessage(colorize("&e/partner prestige &7- Ascend to the next Prestige rank"));
         
         if (player.hasPermission("partnershiprewards.admin")) {
             player.sendMessage(colorize("&e/partner list &7- View all partnerships"));
+        }
+    }
+
+    private void handleLeaderboard(Player player) {
+        new github.revanjay.partnershiprewards.gui.LeaderboardGUI(plugin, player).open();
+    }
+
+    private void handleStats(Player player) {
+        Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
+        if (partnership == null) {
+            player.sendMessage(getMsg("not-partnered"));
+            playErrorSound(player);
+            return;
+        }
+        new github.revanjay.partnershiprewards.gui.StatsGUI(plugin, player, partnership).open();
+    }
+
+    private void handlePropose(Player player, String[] args) {
+        Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
+        if (partnership == null) {
+            player.sendMessage(getMsg("not-partnered"));
+            playErrorSound(player);
+            return;
+        }
+
+        Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
+        if (partner == null || !partner.isOnline()) {
+            player.sendMessage(colorize("&cYour partner must be online to propose!"));
+            playErrorSound(player);
+            return;
+        }
+
+        new github.revanjay.partnershiprewards.gui.ProposalGUI(plugin, player, partner).open();
+        player.sendMessage(colorize("&dProposal sent to &f" + partner.getName() + "&d! Waiting for their answer..."));
+    }
+
+    private void handlePrestige(Player player) {
+        if (plugin.getPrestigeManager() != null) {
+            plugin.getPrestigeManager().performPrestige(player);
         }
     }
     
@@ -630,12 +675,10 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         }
     }
     
-    @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("request", "accept", "reject", "break", "info", "quest", "level", "chat", "gift", "gifts", "sethome", "home", "delhome", "toggle", "top", "list");
+            return Arrays.asList("request", "accept", "reject", "break", "info", "quest", "level", "chat", "gift", "gifts", "sethome", "home", "delhome", "toggle", "top", "leaderboard", "stats", "propose", "prestige", "list");
         }
-        
         if (args.length == 2 && args[0].equalsIgnoreCase("request")) {
             List<String> players = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {

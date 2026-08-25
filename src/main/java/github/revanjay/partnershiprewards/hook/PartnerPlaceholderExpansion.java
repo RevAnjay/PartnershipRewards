@@ -92,6 +92,22 @@ public class PartnerPlaceholderExpansion extends PlaceholderExpansion {
                 if (partnership == null) yield "0";
                 yield String.valueOf(partnership.getDurationInDays());
             }
+            case "prestige" -> {
+                if (partnership == null) yield "0";
+                yield String.valueOf(partnership.getPrestigeLevel());
+            }
+            case "prestige_badge" -> {
+                if (partnership == null || plugin.getPrestigeManager() == null) yield "";
+                yield plugin.getPrestigeManager().getPrestigeBadge(partnership.getPrestigeLevel());
+            }
+            case "status" -> {
+                if (partnership == null) yield "Single";
+                yield github.revanjay.partnershiprewards.model.RelationshipStatus.fromLevel(partnership.getLevel()).getDisplay();
+            }
+            case "status_prefix" -> {
+                if (partnership == null) yield "";
+                yield github.revanjay.partnershiprewards.model.RelationshipStatus.fromLevel(partnership.getLevel()).getChatPrefix();
+            }
             default -> null;
         };
     }
