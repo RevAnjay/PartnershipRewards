@@ -380,6 +380,27 @@ partner-effects:
   max-distance: 10.0          # Max radius for particles
 
 # ═══════════════════════════════════════════════════════
+# RELATIONSHIP STATUS (Progression & Placeholders)
+# ═══════════════════════════════════════════════════════
+relationship:
+  levels:
+    1:
+      name: "&a💚 Buddy"
+      prefix: "&a[Buddy] "
+    5:
+      name: "&9💙 Duo"
+      prefix: "&9[Duo] "
+    10:
+      name: "&5💜 Bonded"
+      prefix: "&5[Bonded] "
+    20:
+      name: "&d💗 Partners"
+      prefix: "&d[Partners] "
+    30:
+      name: "&c❤ Soulmates"
+      prefix: "&c[Soulmates] "
+
+# ═══════════════════════════════════════════════════════
 # PARTNER TITLES (PlaceholderAPI)
 # ═══════════════════════════════════════════════════════
 partner-titles:
@@ -392,7 +413,6 @@ partner-titles:
     15: "Bestie"
     20: "Soulmate"
     25: "Eternal"
-
 # ═══════════════════════════════════════════════════════
 # PARTNER HOME
 # ═══════════════════════════════════════════════════════

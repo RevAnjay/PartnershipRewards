@@ -75,15 +75,11 @@ public class PartnershipRewards extends JavaPlugin {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.8f, 1.5f);
     }
 
-    public static void playButtonClickSound(Player player) {
-        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.8f, 1.0f);
-    }
-    
     @Override
     public void onEnable() {
         saveDefaultConfig();
         ConfigUpdater.updateConfig(this);
-        
+        github.revanjay.partnershiprewards.model.RelationshipStatus.loadFromConfig(this);
         int pluginId = 31270;
         Metrics metrics = new Metrics(this, pluginId);
         
@@ -195,7 +191,7 @@ public class PartnershipRewards extends JavaPlugin {
     }
     public void reload() {
         reloadConfig();
-        
+        github.revanjay.partnershiprewards.model.RelationshipStatus.loadFromConfig(this);
         if (questManager != null) {
             questManager.shutdown();
         }
