@@ -322,13 +322,6 @@ quest:
     SHARE_FOOD:
       enabled: true
       amount: [5, 10, 15]
-    
-    PROPOSE_MARRIAGE:
-      enabled: true
-      xp-reward: 1000
-      chance: 5
-      amount: [1]
-# ============================================
 # Level-Up Rewards
 # ============================================
 level-rewards:

@@ -28,7 +28,6 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     private final Map<UUID, Long> teleportCooldown = new ConcurrentHashMap<>();
     private final Map<UUID, Long> homeCooldowns = new ConcurrentHashMap<>();
     private final Set<UUID> homePending = ConcurrentHashMap.newKeySet();
-    private final Map<UUID, Long> proposalCooldown = new ConcurrentHashMap<>();
     
     public PartnerCommand(PartnershipRewards plugin) {
         this.plugin = plugin;
@@ -62,7 +61,6 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             case "level", "gui" -> handleLevelGUI(player);
             case "top", "leaderboard" -> handleLeaderboard(player);
             case "stats", "queststats" -> handleStats(player);
-            case "propose" -> handlePropose(player, args);
             case "prestige", "prestige-reset" -> handlePrestige(player);
             case "list" -> handleList(player);
             case "chat" -> handleChat(player, args);
@@ -616,7 +614,6 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "toggle <pvp|effects>").replace("{desc}", "Toggle features"));
         player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "top / leaderboard").replace("{desc}", "View leaderboards"));
         player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "stats").replace("{desc}", "View detailed stats"));
-        player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "propose").replace("{desc}", "Propose to partner"));
         player.sendMessage(plugin.getLanguageManager().getMessage("help-format").replace("{cmd}", "prestige").replace("{desc}", "Ascend to next Prestige"));
         
         if (player.hasPermission("partnershiprewards.admin")) {
@@ -638,34 +635,6 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
         new github.revanjay.partnershiprewards.gui.StatsGUI(plugin, player, partnership).open();
     }
 
-    private void handlePropose(Player player, String[] args) {
-        Partnership partnership = plugin.getPartnershipManager().getPartnership(player.getUniqueId());
-        if (partnership == null) {
-            player.sendMessage(getMsg("no-partner"));
-            playErrorSound(player);
-            return;
-        }
-
-        long now = System.currentTimeMillis();
-        Long lastProposal = proposalCooldown.get(player.getUniqueId());
-        if (lastProposal != null && now - lastProposal < 60000L) {
-            long remainingSec = (60000L - (now - lastProposal)) / 1000L;
-            player.sendMessage(getMsg("proposal-cooldown").replace("{seconds}", String.valueOf(remainingSec)));
-            playErrorSound(player);
-            return;
-        }
-
-        Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
-        if (partner == null || !partner.isOnline()) {
-            player.sendMessage(getMsg("proposal-partner-offline"));
-            playErrorSound(player);
-            return;
-        }
-
-        proposalCooldown.put(player.getUniqueId(), now);
-        new github.revanjay.partnershiprewards.gui.ProposalGUI(plugin, player, partner).open();
-        player.sendMessage(getMsg("proposal-sent").replace("{player}", partner.getName()));
-    }
     private void handlePrestige(Player player) {
         if (plugin.getPrestigeManager() != null) {
             plugin.getPrestigeManager().performPrestige(player);
@@ -692,7 +661,7 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
     
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("request", "accept", "reject", "break", "info", "quest", "level", "chat", "gift", "gifts", "sethome", "home", "delhome", "toggle", "top", "leaderboard", "stats", "propose", "prestige", "list");
+            return Arrays.asList("request", "accept", "reject", "break", "info", "quest", "level", "chat", "gift", "gifts", "sethome", "home", "delhome", "toggle", "top", "leaderboard", "stats", "prestige", "list");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("request")) {
             List<String> players = new ArrayList<>();

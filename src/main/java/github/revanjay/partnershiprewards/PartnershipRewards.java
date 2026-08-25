@@ -35,7 +35,6 @@ public class PartnershipRewards extends JavaPlugin {
     private AchievementManager achievementManager;
     private AnniversaryManager anniversaryManager;
     private PrestigeManager prestigeManager;
-    private github.revanjay.partnershiprewards.task.ValentinesTask valentinesTask;
     
     private PartnerListener partnerListener;
     private PlayTogetherTask playTogetherTask;
@@ -136,9 +135,6 @@ public class PartnershipRewards extends JavaPlugin {
             anniversaryManager.shutdown();
         }
 
-        if (valentinesTask != null) {
-            valentinesTask.shutdown();
-        }
         
         if (playTogetherTask != null) {
             playTogetherTask.cancel();
@@ -190,8 +186,6 @@ public class PartnershipRewards extends JavaPlugin {
         this.effectManager.start();
         this.particleEffectManager.start();
         this.anniversaryManager.start();
-        this.valentinesTask = new github.revanjay.partnershiprewards.task.ValentinesTask(this);
-        this.valentinesTask.start();
     }
     
     private void registerHooks() {

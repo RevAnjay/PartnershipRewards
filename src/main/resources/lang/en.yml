@@ -99,10 +99,6 @@ home-teleported: "&aTeleported to partner home!"
 home-cooldown: "&cYou must wait &#00C6F9{seconds} &cseconds before teleporting again."
 home-changed-notify: "&#00C6F9{player} &7has updated the partner home!"
 
-# Proposal
-proposal-cooldown: "&cPlease wait &#00C6F9{seconds}s &cbefore proposing again!"
-proposal-partner-offline: "&cYour partner must be online to propose!"
-proposal-sent: "&aProposal sent to &#00C6F9{player}&a! Waiting for their answer..."
 
 # Prestige
 prestige-not-in-partnership: "&cYou are not in a partnership!"
