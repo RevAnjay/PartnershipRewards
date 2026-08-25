@@ -31,9 +31,9 @@ public class GiftManager {
     }
     
     public void sendGift(Player sender, UUID receiverUuid) {
-        ItemStack item = sender.getInventory().getItemInMainHand();
+        ItemStack held = sender.getInventory().getItemInMainHand();
         
-        if (item.getType().isAir()) {
+        if (held.getType().isAir()) {
             sender.sendMessage(colorize("&cYou must hold an item to send!"));
             playErrorSound(sender);
             return;
@@ -47,21 +47,25 @@ public class GiftManager {
         }
         
         UUID partnerUuid = partnership.getPartner(sender.getUniqueId());
+        ItemStack itemToSend = held.clone();
+        sender.getInventory().setItemInMainHand(null);
         
         SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             int count = plugin.getDatabaseManager().getGiftCount(partnerUuid);
             if (count >= maxPendingGifts) {
                 SchedulerUtil.runTask(plugin, () -> {
-                    sender.sendMessage(colorize("&cPartner already has &e" + maxPendingGifts + " &cpending gifts! Wait until they claim."));
+                    sender.getInventory().addItem(itemToSend);
+                    sender.sendMessage(colorize("&cPartner already has &e" + maxPendingGifts + " &cpending gifts! Item returned."));
                     playErrorSound(sender);
                 });
                 return;
             }
             
-            String serialized = serializeItem(item);
+            String serialized = serializeItem(itemToSend);
             if (serialized == null) {
                 SchedulerUtil.runTask(plugin, () -> {
-                    sender.sendMessage(colorize("&cFailed to send gift! Item cannot be serialized."));
+                    sender.getInventory().addItem(itemToSend);
+                    sender.sendMessage(colorize("&cFailed to send gift! Item cannot be serialized. Item returned."));
                     playErrorSound(sender);
                 });
                 return;
@@ -70,14 +74,11 @@ public class GiftManager {
             plugin.getDatabaseManager().saveGift(sender.getUniqueId(), partnerUuid, serialized, Instant.now().getEpochSecond());
             
             SchedulerUtil.runTask(plugin, () -> {
-                sender.getInventory().setItemInMainHand(null);
-                
-                String partnerName = Bukkit.getOfflinePlayer(partnerUuid).getName();
-                if (partnerName == null) partnerName = partnerUuid.toString();
-                sender.sendMessage(colorize("&aGift sent to &e" + partnerName + "&a!"));
-                sender.sendMessage(colorize("&7Item: &f" + item.getType().name() + " x" + item.getAmount()));
-                
                 Player partner = Bukkit.getPlayer(partnerUuid);
+                String partnerName = partner != null ? partner.getName() : partnerUuid.toString();
+                sender.sendMessage(colorize("&aGift sent to &e" + partnerName + "&a!"));
+                sender.sendMessage(colorize("&7Item: &f" + itemToSend.getType().name() + " x" + itemToSend.getAmount()));
+                
                 if (partner != null) {
                     partner.sendMessage(colorize("&7You received a gift from &e" + sender.getName() + "&7!"));
                     partner.sendMessage(colorize("&7Use &e/partner gifts &7to claim."));

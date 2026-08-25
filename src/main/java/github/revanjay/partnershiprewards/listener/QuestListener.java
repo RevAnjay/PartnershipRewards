@@ -131,36 +131,28 @@ public class QuestListener implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
-        if (event.getInventory().getType() != InventoryType.MERCHANT) return;
-        if (event.getSlot() != 2) return;
-        if (event.getCurrentItem() == null) return;
-        
         UUID playerUuid = player.getUniqueId();
         
-        if (!plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.TRADE_VILLAGER)) return;
+        if (event.getInventory().getType() == InventoryType.MERCHANT && event.getSlot() == 2 && event.getCurrentItem() != null) {
+            if (plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.TRADE_VILLAGER)) {
+                plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.TRADE_VILLAGER, 1);
+            }
+        }
         
-        plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.TRADE_VILLAGER, 1);
+        if (event.getInventory().getType() == InventoryType.ANVIL && event.getSlot() == 2 && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+            if (plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.ANVIL_USE)) {
+                plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.ANVIL_USE, 1);
+            }
+        }
     }
     
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEnchantItem(EnchantItemEvent event) {
         UUID playerUuid = event.getEnchanter().getUniqueId();
         
         if (!plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.ENCHANT_ITEM)) return;
         
         plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.ENCHANT_ITEM, 1);
-    }
-    
-        @EventHandler(priority = EventPriority.MONITOR)
-    public void onPrepareAnvil(PrepareAnvilEvent event) {
-        if (event.getResult() == null) return;
-        if (!(event.getView().getPlayer() instanceof Player player)) return;
-        
-        UUID playerUuid = player.getUniqueId();
-        
-        if (!plugin.getQuestManager().hasActiveQuest(playerUuid, QuestType.ANVIL_USE)) return;
-        
-        plugin.getQuestManager().updateQuestProgress(playerUuid, QuestType.ANVIL_USE, 1);
     }
     
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

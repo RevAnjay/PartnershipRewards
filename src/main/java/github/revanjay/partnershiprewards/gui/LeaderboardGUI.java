@@ -52,6 +52,13 @@ public class LeaderboardGUI implements InventoryHolder, Listener {
         }
     }
 
+    private static final int[] SLOTS = {
+        10, 11, 12, 13, 14, 15, 16,
+        19, 20, 21, 22, 23, 24, 25,
+        28, 29, 30, 31, 32, 33, 34,
+        37, 38, 39, 40, 41, 42, 43
+    };
+
     private final PartnershipRewards plugin;
     private final Player viewer;
     private final Inventory inventory;
@@ -65,7 +72,6 @@ public class LeaderboardGUI implements InventoryHolder, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         loadDataAndRender();
     }
-
     private void loadDataAndRender() {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             List<LeaderboardEntry> entries = fetchEntries(currentTab);
@@ -119,16 +125,9 @@ public class LeaderboardGUI implements InventoryHolder, Listener {
         inventory.setItem(4, EnhancedGUI.createGradientItem(Tab.STREAK.getIcon(), (currentTab == Tab.STREAK ? "&a&l" : "&7") + Tab.STREAK.getTitle(), List.of("&eClick to view Streak leaderboard")));
         inventory.setItem(6, EnhancedGUI.createGradientItem(Tab.PRESTIGE.getIcon(), (currentTab == Tab.PRESTIGE ? "&a&l" : "&7") + Tab.PRESTIGE.getTitle(), List.of("&eClick to view Prestige leaderboard")));
 
-        int[] slots = {
-            10, 11, 12, 13, 14, 15, 16,
-            19, 20, 21, 22, 23, 24, 25,
-            28, 29, 30, 31, 32, 33, 34,
-            37, 38, 39, 40, 41, 42, 43
-        };
-
         if (paginator != null) {
             List<LeaderboardEntry> pageItems = paginator.getCurrentPageItems();
-            for (int i = 0; i < pageItems.size() && i < slots.length; i++) {
+            for (int i = 0; i < pageItems.size() && i < SLOTS.length; i++) {
                 LeaderboardEntry entry = pageItems.get(i);
                 Material icon = entry.rank == 1 ? Material.GOLD_BLOCK : (entry.rank == 2 ? Material.IRON_BLOCK : (entry.rank == 3 ? Material.COPPER_BLOCK : Material.PAPER));
                 String name = "&e#" + entry.rank + " &6" + entry.player1Name + " &7& " + "&6" + entry.player2Name;
@@ -136,7 +135,7 @@ public class LeaderboardGUI implements InventoryHolder, Listener {
                     "&7Score / Value: &a" + entry.score,
                     "&8Tab: " + currentTab.getTitle()
                 );
-                inventory.setItem(slots[i], EnhancedGUI.createGradientItem(icon, name, lore));
+                inventory.setItem(SLOTS[i], EnhancedGUI.createGradientItem(icon, name, lore));
             }
             paginator.applyNavigationButtons(inventory, 48, 50, 49);
         }

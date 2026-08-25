@@ -25,8 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PartnerCommand implements CommandExecutor, TabCompleter {
     
     private final PartnershipRewards plugin;
+    private final Map<UUID, Long> teleportCooldown = new ConcurrentHashMap<>();
     private final Map<UUID, Long> homeCooldowns = new ConcurrentHashMap<>();
     private final Set<UUID> homePending = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, Long> proposalCooldown = new ConcurrentHashMap<>();
     
     public PartnerCommand(PartnershipRewards plugin) {
         this.plugin = plugin;
@@ -640,6 +642,15 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        long now = System.currentTimeMillis();
+        Long lastProposal = proposalCooldown.get(player.getUniqueId());
+        if (lastProposal != null && now - lastProposal < 60000L) {
+            long remainingSec = (60000L - (now - lastProposal)) / 1000L;
+            player.sendMessage(colorize("&cPlease wait &e" + remainingSec + "s &cbefore proposing again!"));
+            playErrorSound(player);
+            return;
+        }
+
         Player partner = Bukkit.getPlayer(partnership.getPartner(player.getUniqueId()));
         if (partner == null || !partner.isOnline()) {
             player.sendMessage(colorize("&cYour partner must be online to propose!"));
@@ -647,10 +658,10 @@ public class PartnerCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        proposalCooldown.put(player.getUniqueId(), now);
         new github.revanjay.partnershiprewards.gui.ProposalGUI(plugin, player, partner).open();
         player.sendMessage(colorize("&dProposal sent to &f" + partner.getName() + "&d! Waiting for their answer..."));
     }
-
     private void handlePrestige(Player player) {
         if (plugin.getPrestigeManager() != null) {
             plugin.getPrestigeManager().performPrestige(player);
