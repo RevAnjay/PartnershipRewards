@@ -127,11 +127,22 @@ public class PartnershipRewards extends JavaPlugin {
         if (effectManager != null) {
             effectManager.shutdown();
         }
+
+        if (particleEffectManager != null) {
+            particleEffectManager.shutdown();
+        }
+
+        if (anniversaryManager != null) {
+            anniversaryManager.shutdown();
+        }
+
+        if (valentinesTask != null) {
+            valentinesTask.shutdown();
+        }
         
         if (playTogetherTask != null) {
             playTogetherTask.cancel();
         }
-        
         if (databaseManager != null) {
             databaseManager.close();
         }
